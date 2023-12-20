@@ -52,7 +52,7 @@ Available commands:
 
 It is worth noting that as mentioned above, the Gremlin console is based on the Groovy console and as such you can enter valid Groovy code directly into the console. So as well as using it to experiment with Graphs and Gremlin you can use it as, for example, a desktop calculator should you so desire!
 
-```gremlin
+```groovy
 gremlin> 2+3
 ==>5
 
@@ -64,4 +64,23 @@ The number is 5
 
 gremlin> for (a in 1..5) {print "${a} "};println()
 1 2 3 4 5
+```
+
+
+## Gremlin version
+```groovy
+// What version of Gremlin console am I running?
+gremlin>  Gremlin.version()
+==>3.4.10
+```
+
+## Saving output from the console to a file
+```groovy
+gremlin> :record start mylog.txt
+Recording session to: "mylog.txt"
+
+gremlin> g.V().count().next()
+==>3618
+gremlin> :record stop
+Recording stopped; session saved as: "mylog.txt" (157 bytes)
 ```
