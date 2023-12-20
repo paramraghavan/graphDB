@@ -1,0 +1,4 @@
+fromAccountId,transactionId,toAccountId,date
+A1,T1,A2,2021-01-15
+A2,T2,A3,2021-02-20
+A3,T3,A1,2021-03-10
