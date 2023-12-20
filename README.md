@@ -12,3 +12,10 @@ bin/gremlin.sh
 ```
 ## Tutorial
 - https://www.kelvinlawrence.net/book/PracticalGremlin.html
+
+# Gremlin
+You can get a list of the available commands by typing :help. Note that all commands to the console itself are prefixed by a colon ":". This enables the
+console to distinguish them as special and different from actual Gremlin and Groovy commands.
+```groovy
+gremlin> :help
+```
