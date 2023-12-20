@@ -84,3 +84,23 @@ gremlin> g.V().count().next()
 gremlin> :record stop
 Recording stopped; session saved as: "mylog.txt" (157 bytes)
 ```
+
+## TinkerGraph
+As well as the Gremlin Console, the TinkerPop 3 download includes an implementation of an in-memory graph store called TinkerGraph.
+The nice thing about TinkerGraph is that for learning and testing things you can run everything you need on your laptop or desktop computer and be up and running very quickly
+
+- When running in the Gremlin Console, support for TinkerGraph should be on by default. If for any reason you find it to be off you, can enable it by issuing the following command.
+  ```groovy
+  gremlin>:plugin use tinkerpop.tinkergraph
+  ```
+- Once the TinkerGraph plugin is enabled you will need to close and re-load the Gremlin console. After doing that, you can create a new TinkerGraph instance from the console as follows.
+  ```groovy
+  gremlin>graph = TinkerGraph.open()
+  // Before you can start to issue Gremlin queries against the graph you also need to establish a graph traversal
+  // source object by calling the new graph’s traversal method as follows. The variable name graph will be used
+  // for any object that represents a graph instance and the variable name g will be used for any object that
+  // represents an instance of a graph traversal source object.
+  gremlin>g = graph.traversal()
+  gremlin>graph.features()
+  ```
+  
