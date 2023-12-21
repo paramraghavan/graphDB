@@ -107,4 +107,31 @@ The nice thing about TinkerGraph is that for learning and testing things you can
   gremlin>g = graph.traversal()
   gremlin>graph.features()
   ```
+
+## How to connect to gremlin server from gremlin console
+- start the Gremlin server
+- start the Gremlin console
+### Connect to the Gremlin Server from console
+- Once the Gremlin Console is open, you can connect to your Gremlin Server using the :remote command followed by the connect command. The default Gremlin Server connection alias is usually g.
+```groovy
+:remote connect tinkerpop.server conf/remote.yaml
+:remote console
+```
+- conf/remote.yaml is the configuration file for the remote connection. This file should be present in your Gremlin Console's directory. It contains the details about how to connect to the Gremlin Server, including the host and port.
+- Issue gremlin commands on gremlin console
+```groovy
+g.V().count() // 6
+// show vertex labels and properties
+g.V().valueMap().with(WithOptions.tokens)
+//Result:
+//==>{id=0, label=account, accountId=[A1], holderName=[John Doe], balance=[10000]}
+//==>{id=18, label=transaction, amount=[1500], transactionId=[T3]}
+//==>{id=4, label=account, accountId=[A2], holderName=[Jane Smith], balance=[5000]}
+//==>{id=8, label=account, accountId=[A3], holderName=[Alice Johnson], balance=[7000]}
+//==>{id=12, label=transaction, amount=[2000], transactionId=[T1]}
+//==>{id=15, label=transaction, amount=[3000], transactionId=[T2]}
+
+```
+
+  
   
