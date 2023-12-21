@@ -1,6 +1,9 @@
-```
-pip install gremlinpython pandas
-```
+"""
+pipenv install gremlinpython pandas
+pipenv install aiohttp async_timeout
+Grenlin server needs to be started, apache-tinkerpop-gremlin-server-3.7.1/bin/gremlin-server.sh start
+"""
+
 
 import pandas as pd
 
@@ -25,6 +28,16 @@ from gremlin_python.process.anonymous_traversal import traversal
 # Connect to your TinkerPop-enabled graph (update the URI as needed)
 g = traversal().withRemote(DriverRemoteConnection('ws://localhost:8182/gremlin','g'))
 
+#
+# Creating an in-memory TinkerGraph instance and start
+# from gremlin_python.structure.graph import Graph
+# import gremlin_python.process.anonymous_traversal
+# # Create a new graph instance (TinkerGraph)
+# graph = Graph()
+# g = graph.traversal()
+# # g = gremlin_python.process.anonymous_traversal.traversal()
+
+
 # Add vertices for accounts
 for idx, row in accounts_df.iterrows():
     g.addV('account').property('accountId', row['accountId']).property('holderName', row['holderName']).property('balance', row['balance']).next()
@@ -44,7 +57,7 @@ for idx, row in transfers_df.iterrows():
 print(g.V().toList())
 print(g.V().valueMap())
 print(g.E().toList())
-print(g.E().hasLabel('transfers').valueMap()
+print(g.E().hasLabel('transfers').valueMap())
 
 
 
