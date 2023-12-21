@@ -4,6 +4,13 @@ pipenv install aiohttp async_timeout
 Grenlin server needs to be started, apache-tinkerpop-gremlin-server-3.7.1/bin/gremlin-server.sh start
 """
 
+import csv
+
+def read_csv(file_name):
+    with open(file_name, mode='r') as file:
+        reader = csv.DictReader(file)
+        return list(reader)
+
 
 import pandas as pd
 
