@@ -10,6 +10,10 @@ brew install openjdk
 cd apache-tinkerpop-gremlin-console-*/
 bin/gremlin.sh
 ```
+- Gremlin server
+  - https://dlcdn.apache.org/tinkerpop/3.7.1/apache-tinkerpop-gremlin-server-3.7.1-bin.zip
+  - apache-tinkerpop-gremlin-server-3.7.1/bin/gremlin-server.sh start
+
 ## Tutorial
 - https://www.kelvinlawrence.net/book/PracticalGremlin.html
 
