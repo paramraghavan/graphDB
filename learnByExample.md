@@ -115,3 +115,15 @@ In graph terminology, an edge has a direction from an "out" vertex to an "in" ve
 //==>[date:2021-01-15]
 //==>[date:2021-02-20]
 ```
+
+## Show vertex labels and properties
+```groovy
+g.V().valueMap().with(WithOptions.tokens)
+//Result:
+//==>{id=0, label=account, accountId=[A1], holderName=[John Doe], balance=[10000]}
+//==>{id=18, label=transaction, amount=[1500], transactionId=[T3]}
+//==>{id=4, label=account, accountId=[A2], holderName=[Jane Smith], balance=[5000]}
+//==>{id=8, label=account, accountId=[A3], holderName=[Alice Johnson], balance=[7000]}
+//==>{id=12, label=transaction, amount=[2000], transactionId=[T1]}
+//==>{id=15, label=transaction, amount=[3000], transactionId=[T2]}
+```
