@@ -1,6 +1,7 @@
 """
 TinkerPop does not have a direct equivalent to Cypher's MERGE command. 
 Instead, you need to check if a vertex or edge exists before creating it.
+Tikerpop3.6 and above have mergeV and mergeE
 """
 
 ```groovy

@@ -133,5 +133,12 @@ g.V().valueMap().with(WithOptions.tokens)
 
 ```
 
-  
-  
+## Steps to Visualize Graph from TinkerPop Server using Gephi:
+- Step 1: Export Graph Data from TinkerPop Server
+- First, you'll need to extract your graph data (vertices and edges) from the TinkerPop server. Use Gremlin queries to retrieve this data and export it into a format like GraphML or GEXF. For example:
+```groovy
+// Example Gremlin query to write graph to GraphML
+g.io('/path/to/graph.graphml').write().iterate()
+```  
+- Step 2: Install Gephi or Cytoscape
+- If you don't have Gephi installed, you can download it from the Gephi website - https://gephi.org/users/download/.  
