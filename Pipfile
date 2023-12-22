@@ -8,6 +8,8 @@ pandas = "*"
 gremlinpython = "*"
 aiohttp = "*"
 async-timeout = "*"
+networkx = "*"
+matplotlib = "*"
 
 [dev-packages]
 
