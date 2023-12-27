@@ -26,29 +26,35 @@ Neptune supports multiple labels for a vertex. When you create a label, you can 
 
 ## Tinkerpop
 **Creating the Vertex with a UUID**
-- Generate the UUID: Generate a UUID in your application code. For example, in Java, you can use UUID.randomUUID().
-- Create the Vertex: Use the generated UUID when creating a vertex. In some graph databases that are TinkerPop-enabled, you can directly set the ID of a vertex (if the database configuration allows it). Here's how you might do it:
-```groovy
-import java.util.UUID;
+- pip install gremlinpython uuid
+```python
+import uuid
+from gremlin_python.structure.graph import Graph
+from gremlin_python.driver.driver_remote_connection import DriverRemoteConnection
+from gremlin_python.process.traversal import T
 
-# In this example:
-# T.id is a TinkerPop token for specifying the ID.
-# uuid is the UUID generated.
-# 'vertexLabel' is your custom label for the vertex.
+# Generate a UUID
+vertex_id = str(uuid.uuid4())
 
-UUID uuid = UUID.randomUUID();
-graph.addVertex(T.id, uuid, 'label', 'vertexLabel');
+# Connection setup for your graph database
+# Replace 'ws://localhost:8182/gremlin' with your Gremlin Server URL
+graph = Graph()
+g = graph.traversal().withRemote(DriverRemoteConnection('ws://localhost:8182/gremlin', 'g'))
+
+# Add a vertex with a custom UUID
+g.addV('vertexLabel').property(T.id, vertex_id).next()
+
+
+# query by user defined id
+# Query the vertex by the custom UUID
+queried_vertex = g.V(vertex_id).toList()
+# Display the result
+print(queried_vertex)
+
+# Close the connection
+g.close()
 ```
-**Querying the Vertex with the UUID**
-```groovy
-# In this query:
-# myUUID is the UUID of the vertex you are looking for. You should replace "your-uuid-here" with the actual UUID string.
-# g.V(myUUID) is the traversal that looks for a vertex with the given UUID.
 
-UUID myUUID = UUID.fromString("your-uuid-here"); // Replace with your UUID
-Vertex myVertex = g.V(myUUID).next();
-
-```
 
 ## Datatype supported for Vertex and edge id's
 In TinkerPop, you can use Integer and String data type as an identifier for a vertex and edge
@@ -70,4 +76,4 @@ g.V(123).next()
   # and a custom property 'myCustomId' with the value 123.
   g.V().has('vertexLabel', 'myCustomId', 123).next()
 
-  - ```
+  ```
