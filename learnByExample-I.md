@@ -203,7 +203,7 @@ for vertex in vertices:
 ## iterate()? - g.addV('airport').property('code', 'LAX').property('name', 'Los Angeles International Airport').iterate()
 Using iterate() is particularly important in scenarios where the result of the traversal is not of interest, but the side effects (like adding or modifying elements in the graph) are.
 
-- In Gremlin, the iterate() step is used at the end of a traversal to force the execution of the traversal. Gremlin traversals are lazy, meaning they are not executed until you explicitly request the results or iterate over them. This design is beneficial for building up complex traversals without incurring the cost of execution until absolutely necessary.
+- In Gremlin, the iterate() step is used at the end of a traversal to force the execution of the traversal. **Gremlin traversals are lazy**, meaning they are not executed until you explicitly request the results or iterate over them. This design is beneficial for building up complex traversals without incurring the cost of execution until absolutely necessary.
 - When you use addV() or other mutating steps like addE(), property(), etc., they only prepare the traversal but do not actually commit the changes to the graph. The iterate() step is used to finalize and execute these traversals, causing the mutations to be applied to the graph.
 - addV('airport'): Prepares to add a vertex with the label 'airport'.
 - property('code', 'LAX'), property('name', 'Los Angeles International Airport'): Adds properties to the new vertex.
@@ -214,3 +214,38 @@ Using iterate() is particularly important in scenarios where the result of the t
 - toList(), next(), toSet(), etc., which are typically used when you want to retrieve the results of a traversal.
 - iterate(), which is used when you don't need the results (like in mutations) but want to ensure the traversal is executed.
 
+
+## What is T.id?
+In Gremlin, particularly in the Gremlin-Python library, T is a class in the gremlin_python.process.traversal module that represents a set of static tokens used in graph traversals. These tokens are used for various purposes, such as referencing specific aspects of a graph element (like a vertex or an edge).
+
+- Element ID Token: T.id is a token that represents the ID of a graph element (vertex or edge).
+- Used in Traversals: It's commonly used in Gremlin traversals to reference the ID of elements. For example, you might use it to filter vertices or edges by their ID.
+- Other common tokens in the T class include T.label (for the label of a graph element), and T.key (for property keys).
+- Example:
+```python
+from gremlin_python.process.traversal import T
+from gremlin_python.process.anonymous_traversal import traversal
+from gremlin_python.driver.driver_remote_connection import DriverRemoteConnection
+
+# Connect to the Gremlin Server
+g = traversal().withRemote(DriverRemoteConnection('ws://localhost:8182/gremlin', 'g'))
+
+# Example of using T.id to fetch a vertex by its ID
+vertex_id = 'some_vertex_id'
+vertex = g.V().has(T.id, vertex_id).next()
+```
+
+### Explain explain g.V().has(T.id, vertex_id) in details
+The expression g.V().has(T.id, vertex_id) is a traversal query that filters vertices based on their ID. 
+
+- g: This is the graph traversal source. It's the starting point for any Gremlin query and represents the entire graph.
+- V(): This step refers to all vertices in the graph. When you call g.V(), you're starting a traversal that will potentially look at every vertex in the graph.
+- has(T.id, vertex_id): This is a filtering step that narrows down the vertices from the previous step. The has() step is used to filter elements based on certain conditions.
+  - T.id: T is a class that contains a collection of static tokens used in Gremlin. T.id specifically refers to the ID of a graph element (in this case, a vertex). It's a way to tell Gremlin that you're interested in filtering based on the ID property.
+  - vertex_id: This is the specific ID you're looking for. The has(T.id, vertex_id) part of the traversal will filter out all vertices except the one (or ones) whose ID matches vertex_id
+- Example:
+```python
+vertex_id = '999'  # The ID of the vertex you're looking for
+vertex = g.V().has(T.id, vertex_id).next()  # Retrieves the vertex with the specified ID
+
+```
