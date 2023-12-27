@@ -123,6 +123,12 @@ The nice thing about TinkerGraph is that for learning and testing things you can
 g.V().count() // 6
 // show vertex labels and properties
 g.V().valueMap().with(WithOptions.tokens)
+
+Above query breaks down as follows:
+- g.V(): This starts a traversal at all vertices in the graph.
+- valueMap(): This fetches the properties of each vertex.
+- with(WithOptions.tokens): This includes the vertex's ID and label in the output.
+
 //Result:
 //==>{id=0, label=account, accountId=[A1], holderName=[John Doe], balance=[10000]}
 //==>{id=18, label=transaction, amount=[1500], transactionId=[T3]}
