@@ -1,10 +1,15 @@
 # Neptune and Indexes
-
-
 In Amazon Neptune, creating and using indexes for vertices and edges is quite different from traditional relational databases.
 Neptune automatically manages indexes to optimize the performance of graph queries. Users do not create indexes in the 
 traditional sense (like creating an index on a column in a relational database). Instead, Neptune uses a system of internal 
-indexing based on the graph data model to efficiently execute queries.
+indexing based on the graph data model to efficiently execute queries. The indexing is optimized for typical graph query 
+access patterns, such as:
+* Looking up a vertex or edge by its ID.
+* Traversing relationships (edges) from a given vertex.
+* Querying vertices or edges based on property values.
+
+>While **you can't use the explain()** step in Neptune to analyze query execution plans, understanding how Neptune 
+> automatically manages indexes can help you write efficient queries. 
 
 **Neptune's Indexing Mechanism**
 - **Graph Data Model**: Neptune uses a quad-based graph data model, with each quad consisting of **subject (S), predicate (P), object (O), 
