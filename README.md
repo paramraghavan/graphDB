@@ -1,3 +1,7 @@
+**What is Tinkerpop**
+Apache TinkerPop is an open-source project providing a framework and a set of tools to unify different graph technologies under a common framework and language has made it a cornerstone in the field of graph computing. TinkerPop defines both a graph computing framework and a query language called Gremlin.
+
+
 # Installing Apache TinkerPop on a Mac
 - TinkerPop requires Java to be installed on your system. You can check if Java is already installed and what version it is by running
 ```shell
@@ -119,6 +123,8 @@ The nice thing about TinkerGraph is that for learning and testing things you can
 ```
 - conf/remote.yaml is the configuration file for the remote connection. This file should be present in your Gremlin Console's directory. It contains the details about how to connect to the Gremlin Server, including the host and port.
 - Issue gremlin commands on gremlin console
+- When you want to run Gremlin queries on a graph database that is not hosted locally, but on a remote server, you use the **:remote console** command to route your queries to that server.
+  
 ```groovy
 g.V().count() // 6
 // show vertex labels and properties
