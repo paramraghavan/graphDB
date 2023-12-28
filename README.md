@@ -154,3 +154,19 @@ g.io('/path/to/graph.graphml').write().iterate()
 ```  
 - Step 2: Install Gephi or Cytoscape
 - If you don't have Gephi installed, you can download it from the Gephi website - https://gephi.org/users/download/.  
+
+## explain plan - explain()
+The explain() step is used to provide a detailed explanation of the traversal strategy and the optimizations applied by the query planner. This is particularly useful for understanding how a given Gremlin query will be executed, which can help in optimizing and debugging your queries.
+
+```groovy
+g.V().has('person', 'name', 'Alice').out('friends').values('name').explain()
+```
+This query does the following:
+* g.V(): Start from all vertices.
+* .has('person', 'name', 'Alice'): Filter vertices to find those that have a label 'person' and a property 'name' with the value 'Alice'.
+* .out('friends'): Traverse to the outgoing 'friends' edges.
+* .values('name'): Extract the 'name' property of these friend vertices.
+* explain
+  * shows steps of the traversal.
+  * Optimization strategies used (e.g., filter optimization, index usage).
+  * The order in which steps are executed, which might differ from the order in which they are written due to optimizations.
