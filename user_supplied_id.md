@@ -57,9 +57,10 @@ g.close()
 
 
 ## Datatype supported for Vertex and edge id's
-In Apache TinkerPop, the ability to use a number or string datatype for the vertex ID depends on the underlying graph database you are using with TinkerPop. TinkerPop itself is a graph computing framework that provides a standard way to interact with various graph databases, but it doesn't enforce specific data types for vertex IDs. This flexibility means the actual data types allowed for vertex IDs, including whether you can use a string, is determined by the specific graph database implementation.
+In Apache TinkerPop, the ability to use a number or string datatype for the vertex ID depends on the underlying graph database you are using with TinkerPop.
+TinkerPop itself is a graph computing framework that provides a standard way to interact with various graph databases, but it doesn't enforce specific data types for vertex IDs. This flexibility means the actual data types allowed for vertex IDs, including whether you can use a string, is determined by the specific graph database implementation.
 
-In TinkerPop, you can use Long data type as an identifier for a vertex and edge
+Inmemory TinkerGraph, you can use Long data type as an identifier for a vertex and edge
 ```groovy
 g.addV('vertexLabel').property(id, 123).next()
 # Query vertx by id
