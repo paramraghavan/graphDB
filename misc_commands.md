@@ -56,8 +56,18 @@ Delete all vertices and edges in a TinkerPop-enabled graph database using Gremli
 # .drop(): Marks each vertex for deletion.
 # .iterate(): Executes the operation.
 g.V().drop().iterate()
+```
+
+- clean up using curl command
+```
+curl -X POST --data-urlencode "update=DELETE WHERE { ?s ?p ?o }" http://your-neptune-endpoint:8182/sparql
 
 ```
+
+## distict labels
+- g.V().label().dedup()
+- g.E().label().dedup()
+- g.E().label().dedup().count()
 
 
 ## Backup Graph
