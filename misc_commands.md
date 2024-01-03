@@ -48,6 +48,17 @@ print(edges_df)
 
 ```
 
+## query all vertices with a certain label and their outgoing edges with certain labels in a Gremlin graph
+```groovy
+g.V().hasLabel('vertexLabel').outE('edgeLabel')
+
+# query and print the vertices and edges
+g.V().hasLabel('vertexLabel').outE('edgeLabel').project('vertex', 'edge')
+  .by(inV().values('propertyName').fold())
+  .by(valueMap())
+
+```
+
 ## Cleanup
 Delete all vertices and edges in a TinkerPop-enabled graph database using Gremlin, you can use a straightforward Gremlin query. 
 
