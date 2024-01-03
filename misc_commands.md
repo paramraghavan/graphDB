@@ -61,7 +61,8 @@ g.V().drop().iterate()
 - clean up using curl command
 ```
 curl -X POST --data-urlencode "update=DELETE WHERE { ?s ?p ?o }" http://your-neptune-endpoint:8182/sparql
-
+OR
+curl -X POST -d '{"gremlin":"g.V().drop().iterate()"}' http://your-neptune-endpoint:8182/gremlin
 ```
 
 ## distict labels
