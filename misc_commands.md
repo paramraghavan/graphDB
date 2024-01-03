@@ -59,6 +59,7 @@ g.V().drop().iterate()
 
 ```
 
+
 ## Backup Graph
 3 steps
 - Query the Graph Database: Use Gremlin queries to retrieve all vertices and edges.
