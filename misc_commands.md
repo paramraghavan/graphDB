@@ -66,7 +66,7 @@ Delete all vertices and edges in a TinkerPop-enabled graph database using Gremli
 # g.V(): Retrieves all vertices in the graph.
 # .drop(): Marks each vertex for deletion.
 # .iterate(): Executes the operation.
-g.V().drop().iterate()
+g.V().limit(10000).drop().iterate()
 ```
 
 - clean up using curl command
