@@ -3,16 +3,22 @@ import matplotlib.pyplot as plt
 from gremlin_python.structure.graph import Graph
 from gremlin_python.driver.driver_remote_connection import DriverRemoteConnection
 from gremlin_python.process.traversal import T
+from gremlin_python.process.graph_traversal import __
+from gremlin_python.process.anonymous_traversal import traversal
 
 # Define the Neptune server connection configuration
 neptune_host = "localhost"
 neptune_port = 8182
 
+"""
+Note the miles between routes are some random value
+"""
 
 # Connect to your Gremlin Server
 graph = Graph()
 remoteConn = DriverRemoteConnection(f'ws://{neptune_host}:{neptune_port}/gremlin','g')
-g = graph.traversal().withRemote(remoteConn)
+#g = graph.traversal().withRemote(remoteConn)
+g = traversal().withRemote(remoteConn)
 
 # Execute a Gremlin query to retrieve airports and routes data
 # results = g.V().hasLabel('airport').valueMap().toList()
@@ -20,9 +26,10 @@ g = graph.traversal().withRemote(remoteConn)
 results = g.V().project('id', 'label', 'properties')\
               .by(T.id)\
               .by(T.label)\
-              .by(__.valueMap())\
+              .by(__.value_map())\
               .toList()
 print(results)
+print('---')
 
 # Create a NetworkX graph to represent the data
 G = nx.Graph()
@@ -48,19 +55,11 @@ for result in results:
 results = g.E().project('id', 'label', 'outV', 'inV', 'properties')\
      .by(T.id)\
      .by(T.label)\
-     .by(__.outV().id())\
-     .by(__.inV().id())\
-     .by(__.valueMap())\
+     .by(__.out_v())\
+     .by(__.in_v())\
+     .by(__.value_map())\
      .toList()
-
-# Add routes as edges
-for result in results:results = g.E().project('id', 'label', 'outV', 'inV', 'properties')\
-     .by(T.id)\
-     .by(T.label)\
-     .by(__.outV().id())\
-     .by(__.inV().id())\
-     .by(__.valueMap())\
-     .toList()
+print(results)
 
 # Add routes as edges
 for result in results:

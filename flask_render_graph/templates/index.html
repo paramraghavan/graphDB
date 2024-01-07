@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gremlin Query</title>
+</head>
+<body>
+    <h1>Gremlin Query</h1>
+    <form method="POST">
+        <label for="query">Enter Gremlin Query:</label>
+        <textarea name="query" rows="4" cols="50"></textarea>
+        <br>
+        <input type="submit" value="Submit Query">
+    </form>
+    <hr>
+    <h2>Query Result</h2>
+    <div id="result"></div>
+    <script>
+        // JavaScript code to handle form submission and result rendering
+        const form = document.querySelector("form");
+        const resultDiv = document.getElementById("result");
+
+        form.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const formData = new FormData(form);
+            const query = formData.get("query");
+            const response = await fetch("/", {
+                method: "POST",
+                body: formData,
+            });
+            const data = await response.json();
+            resultDiv.innerHTML = JSON.stringify(data, null, 4);
+        });
+    </script>
+</body>
+</html>
