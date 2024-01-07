@@ -40,3 +40,9 @@ Inside your Jupyter Notebook, open the notebook where you want to use the Conda 
 ```shell
 jupyter notebook
 ```
+
+## The generated graph with Lables for Vertices and edges
+![Unknown.png](..%2F..%2F..%2F..%2FLibrary%2FGroup%20Containers%2Fgroup.com.apple.notes%2FAccounts%2F87C6751C-A9D7-4ED1-8595-52933ACC36DA%2FMedia%2F90BD366B-7C56-423E-B224-61F0D0A9CC52%2FUnknown.png)
+
+￼
+
