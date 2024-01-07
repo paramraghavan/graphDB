@@ -1,0 +1,11 @@
+name: neptune_graph_viz
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10  # Specify your desired Python version
+  - jupyter
+  - gremlinpython
+  - networkx  # Optional, for graph visualization
+  - matplotlib #  Neptune or TinkerPop server, retrieve data, and visualize it using NetworkX and Matplotlib.
+  - ipykernel # This package provides the necessary tools to create a Jupyter kernel associated with the environment.

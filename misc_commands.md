@@ -2,16 +2,48 @@
 
 Gremlin itself doesn't inherently support a "table" structure like SQL, you would typically format the results into a table-like structure in your application code after retrieving the data. However, you can structure your query to make this post-processing as straightforward as possible.
 
+
+## the double underscore __ 
+In Gremlin, the double underscore __ is used as an anonymous traversal source. It's a way to start a new traversal within the context of another traversal. This is particularly useful in scenarios where you want to apply a traversal step (like valueMap()) in the middle of an ongoing traversal sequence.
+
+Suppose you have a graph with vertices representing airports, and these vertices have properties like airport code and airport name. If you
+want to retrieve these properties for each airport, you can use the valueMap() step. However, if you're already in the middle of a traversal 
+(like when using project() to format your output), you need to start a new traversal for the properties. That's where __ comes in.
+
+### Without __:
+```python
+g.V().valueMap('code', 'name').toList()
+```
+
+### With __:
+In the following query, you're projecting each vertex into two fields: 'id' and 'details'. The id is obtained directly using T.id, but for 'details', you need to fetch both code and name. Here, __.valueMap(‘code’, ‘name’) starts a new traversal for each vertex being processed, fetching the name and age properties.
+* g.V(): Starts a traversal from all vertices in the graph.
+* project('id', 'details'): Formats the output into two fields, 'id' and 'details'.
+* by(T.id): Fills the 'id' field with the vertex ID.
+* by(__.valueMap(‘code’, ‘name’)): Fills the 'details' field. The double underscore __ starts a new traversal for each vertex to fetch its code and name properties.
+
+```python
+g.V().project('id', 'details').by(T.id).by(__.valueMap('code', 'name')).toList()
+
+#output
+# [{'id': 9664, 'details': {'code': ['LHR'], 'name': ['Heathrow Airport']}},
+#  {'id': 3458,
+#   'details': {'code': ['CDG'], 'name': ['Charles de Gaulle Airport']}}
+# ]
+
+```
+
 ## Listing All Vertices
 ```groovy
 # This query will return a list of maps, where each map represents
 # a vertex with its id, label, and a map of its properties (properties).
-g.V().project('id', 'label', 'properties')
-     .by(T.id)
-     .by(T.label)
-     .by(valueMap())
-     .toList()
-
+g.V().project('id', 'label', 'properties')\
+      .by(T.id)\
+      .by(T.label)\
+      .by(__.valueMap())\
+      .toList()
+# Note:
+# __ before valueMap() to indicate it's a step in the traversal.
 ```
 
 ## Listing All Edges
@@ -21,13 +53,17 @@ g.V().project('id', 'label', 'properties')
 # label, outV (outgoing vertex ID), inV (incoming vertex ID), 
 # and a map of its properties (properties).
 
-g.E().project('id', 'label', 'outV', 'inV', 'properties')
-     .by(T.id)
-     .by(T.label)
-     .by(outV().id())
-     .by(inV().id())
-     .by(valueMap())
+results = g.E().project('id', 'label', 'outV', 'inV', 'properties')\
+     .by(T.id)\
+     .by(T.label)\
+     .by(__.outV().id())\
+     .by(__.inV().id())\
+     .by(__.valueMap())\
      .toList()
+     
+# output
+#[{'id': 22016, 'label': 'route', 'outV': 3458, 'inV': 4739, 'properties': {'miles': 7459}}, 
+#{'id': 29953, 'label': 'route', 'outV': 3458, 'inV': 2336, 'properties': {'miles': 6298}}]    
 ```
 
 # Tablular format using python + pandas 
