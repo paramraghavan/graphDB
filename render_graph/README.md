@@ -6,8 +6,8 @@ Visualize graph by connecting to AWS Neptune and work working jupyter notebook
 
 ## Setup conda
 ```shell
-wget https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -O ~/miniconda.sh
-~/miniconda.sh -b -p $HOME/miniconda 
+$ wget https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -O ~/miniconda.sh
+$ ~/miniconda.sh -b -p $HOME/miniconda 
 ```
 
 ## Create and start conda env  
