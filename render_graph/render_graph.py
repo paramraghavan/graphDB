@@ -71,7 +71,7 @@ for result in results:
     destination_vm = g.V(result['inV']).valueMap().next()
     print(destination_vm)
     destination_airport_id = destination_vm['code']
-    G.add_edge(source_airport_id[0], destination_airport_id[0], miles=result['properties']['miles'])
+    G.add_edge(source_airport_id[0], destination_airport_id[0], label=result['properties']['miles'])
 
 # Visualize the graph
 pos = nx.spring_layout(G)
@@ -84,5 +84,10 @@ nx.draw(G, pos, with_labels=True, node_size=1000, node_color='skyblue', font_siz
 #     print(item[0], item[1]['name'])
 # labels = {item[0]: item[1]['name'] for node in G.nodes.data()}
 # nx.draw_networkx_labels(G, pos, labels=labels, font_size=8)
+
+# Draw edge labels
+edge_labels = nx.get_edge_attributes(G, 'label')
+nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
+
 plt.title('Airport Routes Graph')
 plt.show()
