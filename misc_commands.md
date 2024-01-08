@@ -301,7 +301,7 @@ g.V().has('airport', 'code', 'MIA') // start at the Miami airport vertex
  
 ## tree
 ```markdown
-Get all the path from root to leaves which has at least one of the vertex from a vertexList.
+Get all the path from root to leaves which has at least one of the vertex from a vertexList, vertexList = [2,3,5,6]
 
 g.V(1).repeat(out()).until(outE().count().is(0)).path().
   filter(unfold().is(within(vertexList)))
