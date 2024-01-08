@@ -112,6 +112,13 @@ The nice thing about TinkerGraph is that for learning and testing things you can
   gremlin>graph.features()
   ```
 
+## conf/remote.yaml file on the console side
+```yaml
+hosts: [localhost]
+port: 8182
+serializer: { className: org.apache.tinkerpop.gremlin.util.ser.GraphBinaryMessageSerializerV1, config: { serializeResultToString: true }}
+```
+
 ## How to connect to gremlin server from gremlin console
 - start the Gremlin server
 - start the Gremlin console
