@@ -297,3 +297,18 @@ g.V().has('airport', 'code', 'MIA') // start at the Miami airport vertex
 >Replace 'airport' and 'code' with the actual label and property names used in your graph. If you want to limit the traversal to a 
 >certain number of hops (e.g., only direct flights to Miami), you can modify the query to include a times(n) step after repeat,
 > where n is the number of hops you want to allow
+> 
+ 
+## tree
+```markdown
+Get all the path from root to leaves which has at least one of the vertex from a vertexList.
+
+g.V(1).repeat(out()).until(outE().count().is(0)).path().
+  filter(unfold().is(within(vertexList)))
+
+
+Get all such paths, where path contains at least half of the vertices from vertexList.
+
+g.V(1).repeat(out()).until(outE().count().is(0)).path().
+  filter(unfold().is(within(vertexList)).count().is(gte(vertexList.size() / 2))
+```
