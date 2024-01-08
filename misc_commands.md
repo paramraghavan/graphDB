@@ -259,3 +259,41 @@ g.V().has('airport', 'code', 'JFK').inE().outV().path().by('code')
 ```groovy
 g.V().has('airport', 'code', 'JFK').outE().inV().path().by('code')
 ```
+
+## Query all airports downstream to an airport for example JFK
+```groovy
+g.V().has('airport', 'code', 'JFK') // start at the JFK airport vertex
+  .repeat(out()) // repeat traversal from each vertex to its outgoing vertices
+  .emit() // include all visited vertices in the results
+  .dedup() // remove duplicates
+  .values('code') // extract the airport codes of the downstream airports
+  .toList() // collect the results into a list
+```
+- has('airport', 'code', 'JFK'): Filters vertices to find the one that represents JFK airport.
+- repeat(out()): Repeats the traversal from each airport to the airports it has routes to. This follows the direction of the edges, effectively finding downstream airports.
+- emit(): Outputs the airports at each step of the traversal.
+- dedup(): Removes any duplicate airports that might be reached through different routes.
+- values('code'): Gets the 'code' property of the airport vertices, which represents the airport codes.
+- toList(): Collects all the results into a list.
+> If you want to limit the depth of the traversal to, for example, only airports that can be reached with one connecting flight, 
+> you can add a times(n) step after repeat where n is the number of allowed "hops".
+
+## All airpots upstream to MIA
+```groovy
+g.V().has('airport', 'code', 'MIA') // start at the Miami airport vertex
+  .repeat(in()) // repeat traversal from each vertex to its incoming vertices
+  .emit() // include all visited vertices in the results
+  .dedup() // remove duplicates
+  .values('code') // extract the airport codes of the upstream airports
+  .toList() // collect the results into a list
+```
+- has('airport', 'code', 'MIA'): This step finds the vertex that represents Miami Airport, assuming that 'airport' is the label of airport vertices and 'code' is the property that stores the airport code.
+- repeat(in()): This step repeatedly traverses from each airport to the airports that have a route to it. The in() step specifically follows incoming edges to the current vertex, which corresponds to routes from other airports to the current one.
+- emit(): This step ensures that all vertices visited during the traversal are included in the results.
+- dedup(): This step is used to remove any duplicate vertices that may have been visited more than once during the traversal.
+- values('code'): This step retrieves the values of the 'code' property, which should be the airport codes.
+- toList(): This step collects all the airport codes into a list which will be the output of the query.
+
+>Replace 'airport' and 'code' with the actual label and property names used in your graph. If you want to limit the traversal to a 
+>certain number of hops (e.g., only direct flights to Miami), you can modify the query to include a times(n) step after repeat,
+> where n is the number of hops you want to allow
