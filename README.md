@@ -177,3 +177,8 @@ This query does the following:
   * shows steps of the traversal.
   * Optimization strategies used (e.g., filter optimization, index usage).
   * The order in which steps are executed, which might differ from the order in which they are written due to optimizations.
+
+
+## Useful links
+- https://github.com/aws/graph-notebook
+- https://github.com/aws/graph-notebook.git
