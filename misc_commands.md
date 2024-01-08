@@ -221,3 +221,41 @@ for e in edges_data:
     properties = {k: e[k][0] for k in e if k not in ['id', 'label']}
     g.addE(e['label']).from_(g.V(e['outV'])).to(g.V(e['inV'])).propertyMap(properties).next()
 ```
+
+## All Routes Between Two Given Airports
+Let's assume the airports are represented as vertices in your graph and routes as edges. If each airport has a unique identifier (like an airport code), you can use them to specify the source and target airports. Here's a generic Gremlin query to find all routes between two airports, identified by airport1 and airport2:
+```groovy
+g.V().has('airport', 'code', 'airport1')
+  .repeat(bothE().otherV())
+  .until(has('airport', 'code', 'airport2'))
+  .path()
+  .toList()
+# b/w jfk and LAX
+g.V().has('airport', 'code', 'JFK').\
+repeat(out().simplePath()).\
+until(has('airport', 'code', 'LAX'))\
+.path()\
+.by('code')
+```
+
+## All Routes In and Out of an Airport
+
+```groovy
+g.V().has('airport', 'code', 'airportCode')
+  .bothE()
+  .project('route', 'from', 'to')
+  .by('id')
+  .by(outV().values('code'))
+  .by(inV().values('code'))
+  .toList()
+
+```
+
+- Incoming routes
+```groovy
+g.V().has('airport', 'code', 'JFK').inE().outV().path().by('code')
+```
+- Outgoing routes
+```groovy
+g.V().has('airport', 'code', 'JFK').outE().inV().path().by('code')
+```
