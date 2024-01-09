@@ -311,4 +311,17 @@ Get all such paths, where path contains at least half of the vertices from verte
 
 g.V(1).repeat(out()).until(outE().count().is(0)).path().
   filter(unfold().is(within(vertexList)).count().is(gte(vertexList.size() / 2))
+
+
+g.V().has('Entity', 'name', 'sourceEntityName') // Start at the source entity
+  .repeat(out('childOf')) // Traverse through 'childOf' relationships
+  .until(has('Entity', 'name', 'targetEntityName')) // Continue until the target entity is reached
+  .path() // Collect the path from source to target
+  .toList() // Output the result as a list
+
+g.V().has('Entity', 'name', 'sourceEntityName'): Starts the traversal at the vertex representing the source entity.
+.repeat(out('childOf')): Repeatedly follows the childOf edges to downstream entities.
+.until(has('Entity', 'name', 'targetEntityName')): Continues the traversal until it finds the target entity.
+.path(): Collects the entire path of the traversal from the source to the target.
+.toList(): Converts the result to a list for output.
 ```
