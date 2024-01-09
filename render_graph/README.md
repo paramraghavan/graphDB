@@ -19,6 +19,14 @@ $ ~/miniconda.sh -b -p $HOME/miniconda
 # This command creates an environment based on the dependencies listed in the "environment.yml" - neptune_graph_viz.yaml file.
 conda env create -f ./neptune_graph_viz.yaml
 conda activate neptune_graph_viz
+## one time
+pip install graph-notebook
+# one time Install and Enable Jupyter Extensions: graph-noteboo
+jupyter nbextension install --py --sys-prefix graph_notebook.widgets
+jupyter nbextension enable --py --sys-prefix graph_notebook.widgets
+# end one time
+
+
 # To deactivate an active environment, use
 #
 #     $ conda deactivate
