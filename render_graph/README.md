@@ -22,7 +22,10 @@ conda activate neptune_graph_viz
 # To deactivate an active environment, use
 #
 #     $ conda deactivate
-
+# list conda envs
+conda info --envs
+# remove env
+conda env remove --name neptune_graph_viz
 ```
 
 ## Create Jupyter Kernel
