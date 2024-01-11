@@ -1,6 +1,6 @@
-# visualization tools
+# Neptune and visualization tools
 
-## added my  vertexes and edges to the neptune graph database,  what are the options for visualizing the data
+Added vertexes and edges to the neptune graph database,  what are the options for visualizing the data
 
 **Amazon Neptune Workbench**
 Amazon Neptune Workbench, integrated with Amazon Neptune, is a Jupyter Notebook-based tool that allows you to run queries and visualize results directly within AWS Management Console.
