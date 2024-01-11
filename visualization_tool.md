@@ -7,7 +7,7 @@ Amazon Neptune Workbench, integrated with Amazon Neptune, is a Jupyter Notebook-
 - Pros: Easy to set up and use within AWS. Supports both Gremlin and SPARQL queries.
 - Cons: Visualization capabilities might be basic and not suitable for very complex graph visualizations.
 
-**Graph Visualization Tools**
+**Graph Visualization**
 Tools like Gephi, Graphistry, or Cytoscape can be used to visualize graph data. You would typically export your graph data from Neptune and import it into these tools.
 - Pros: Powerful visualization capabilities, good for complex graphs.
 - Cons: Requires data export from Neptune and might not be ideal for real-time visualizations.
@@ -21,7 +21,7 @@ You can use graph libraries in programming languages like Python (e.g., NetworkX
 - Graph Notebook: As you mentioned earlier, graph-notebook is a Jupyter Notebook extension provided by AWS that allows you to visualize the graph data stored in Neptune. It supports interactive graph queries and visualizations using Gremlin and SPARQL.
 
 **Tableau**
-- Known for data visualization, Tableau can connect to Neptune using its Web Data Connector.
+- Tableau can connect to Neptune using its Web Data Connector.
 
 **Tom Sawyer Software**
 - Offers advanced graph visualization and analysis tools, and it can integrate with Neptune.
@@ -34,3 +34,6 @@ You can use graph libraries in programming languages like Python (e.g., NetworkX
 
 **Graphistry** 
 - A tool for visualizing large graph data, Graphistry can be used to create interactive visualizations and is compatible with a range of databases, including Neptune.
+
+**Keylines**
+- seems to have lots of functionality for graph visualization. Cons -licensing fees and steep learning curve once you try to implement the nifty functionalities.
