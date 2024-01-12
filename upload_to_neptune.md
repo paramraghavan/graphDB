@@ -34,7 +34,7 @@ curl -X POST \
       "iamRoleArn" : "your-iam-role-arn",
       "region" : "your-region",
       "failOnError" : "FALSE"
-    }'
+    }
 curl -X POST \
     -H 'Content-Type: application/json' \
     https://your-neptune-endpoint:8182/loader -d '
@@ -78,9 +78,43 @@ curl -X POST \
   "files" : [ "airports.csv", "routes.csv" ]
 }'
 
+curl -X POST https://your-neptune-endpoint:port/loader \
+     -H 'Content-Type: application/json' \
+     -d '
+     {
+       "source" : "s3://bucket-name/object-key-name",
+       "format" : "opencypher",
+       "userProvidedEdgeIds": "TRUE",
+       "iamRoleArn" : "arn:aws:iam::account-id:role/role-name",
+       "region" : "region",
+       "failOnError" : "FALSE",
+       "parallelism" : "MEDIUM",
+     }'
+
+```
+```python
+import requests
+
+headers = {
+    'Content-Type': 'application/json',
+}
+
+data = {
+     "source" : "s3://bucket-name/object-key-name",
+     "format" : "opencypher",
+     "userProvidedEdgeIds": "TRUE",
+     "iamRoleArn" : "arn:aws:iam::account-id:role/role-name",
+     "region" : "region",
+     "failOnError" : "FALSE",
+     "parallelism" : "MEDIUM",
+}
+
+response = requests.post('http://fiddle.jshell.net/echo/html/', headers=headers, data=data)
 ```
 
+- ref https://docs.aws.amazon.com/neptune/latest/userguide/load-api-reference-load.html
 - Replace your-neptune-endpoint, your-bucket-name, your-iam-role-arn, and your-region with your specific details.
+- https://curlconverter.com/python/
 
 ## Ensuring No Duplicates
 To make sure an airport is not uploaded twice:
