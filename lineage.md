@@ -29,3 +29,13 @@ g.V().has('data_source', 'name', 'sourceName')
   .path()
   .toList()
 ```
+
+* Graph list all the downstreams from vertex,  limit to depth n
+```groovy
+g.V(startVertexId) // Start from a specific vertex
+  .repeat(out())   // Repeat traversing downstream
+    .times(n)      // Limit the depth to n
+  .dedup()         // Remove duplicate vertices
+  .toList()        // Collect the results into a list
+
+```
