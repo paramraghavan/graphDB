@@ -39,3 +39,25 @@ g.V(startVertexId) // Start from a specific vertex
   .toList()        // Collect the results into a list
 
 ```
+
+* Graph list all the downstreams vertices and edgesfrom vertex,  limit to depth n
+```gremlin
+g.V(startVertexId) // start from a specific vertex
+  .repeat(outE().inV()) // repeat traversing from vertex to outgoing edges to their in-vertices
+    .times(n) // do this for n levels deep
+  .path() // collect the paths traversed
+  .toList() // convert the result to a list
+```
+
+* List both vertices and edges together
+
+```gremlin
+// For vertices
+g.V()
+
+// For edges
+g.E()
+
+/ For both vertices and edges
+g.V().bothE()
+```
