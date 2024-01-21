@@ -20,6 +20,7 @@ bin/gremlin.sh
 
 ## Tutorial
 - https://www.kelvinlawrence.net/book/PracticalGremlin.html
+- [Gremlin CheatSheet](https://dkuppitz.github.io/gremlin-cheat-sheet/101.html)
 
 # Gremlin
 You can get a list of the available commands by typing :help. Note that all commands to the console itself are prefixed by a colon ":". This enables the
