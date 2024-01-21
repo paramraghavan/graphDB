@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Graph Viewer</title>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+</head>
+<body>
+    <form id="queryForm" action="query" method="POST">
+        <input type="text" id="queryInput"  placeholder="Enter Gremlin query" />
+        <button type="submit">Submit</button>
+    </form>
+<!--    <div id="graph"></div>-->
+    <svg width="800" height="600" id="graph"></svg>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
