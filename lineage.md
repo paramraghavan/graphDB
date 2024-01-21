@@ -98,3 +98,14 @@ g.V().repeat(bothE().otherV()).times(d).path().by(elementMap())
 - by(elementMap()): Maps each element (vertex or edge) in the path to a map of its properties.
 
 ```
+
+### When running above queries in gremli-pythosn appemd .toList(), as gremlin does *lazy evaluation**
+**lazy evaluation** - plays a crucial role in how queries are constructed and executed. Gremlin is designed to build up a 
+traversal (a sequence of steps) and only execute it when a terminal step (an action that triggers execution) is reached.
+
+```python
+ # This line sends the query to the Gremlin server and waits for the results. 
+ # The toList() method is crucial as it triggers the actual execution of the query.
+results = g.V()...toList()
+for path in results: 
+ print(path)  # This iterates over the returned results and prints them.
