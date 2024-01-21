@@ -85,3 +85,16 @@ g.V().as('vertex')
 ```
 - repeat(bothE().as('edge').bothV().as('related_vertex')): This part of the query is repeated.
 - times(2): This limits the repetition to 2 times, effectively setting your depth to 2.
+
+* gremlin traverse the path and list all the vertices and edges and limit by depth d,   2
+
+```groovy
+g.V().repeat(bothE().otherV()).times(d).path().by(elementMap())
+
+- g.V(): Starts the traversal from all vertices in the graph.
+- repeat(bothE().otherV()): Repeats the pattern of traversing both edges (bothE()) and the adjacent vertices (otherV()).
+- times(d): Specifies the depth of the traversal. Replace d with the desired depth limit.
+- path(): Collects the paths traversed.
+- by(elementMap()): Maps each element (vertex or edge) in the path to a map of its properties.
+
+```
