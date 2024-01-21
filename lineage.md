@@ -58,6 +58,30 @@ g.V()
 // For edges
 g.E()
 
-/ For both vertices and edges
+// Retrieve all edges both IN and OUT
 g.V().bothE()
 ```
+
+* retrieve vertices along with their edges and the nature of their relationships`
+```gremlin
+g.V().as('vertex').bothE().as('edge').bothV().as('related_vertex').select('vertex', 'edge', 'related_vertex').dedup()
+```
+
+- g.V(): This starts the traversal at all vertices in the graph.
+- as('vertex'): This step labels the current step (the vertices) for later reference.
+- bothE(): This extends the traversal to the edges connected to these vertices. It includes both incoming and outgoing edges.
+- as('edge'): This labels the edges for later reference.
+- bothV(): This step extends the traversal from the edge to both vertices that the edge connects (it effectively gets the vertex on the other end of the edge).
+- as('related_vertex'): This labels the vertices connected by the edge.
+- select('vertex', 'edge', 'related_vertex'): Finally, this step selects the vertices, edges, and related vertices, essentially creating 
+a map of each vertex, its connected edges, and the vertices on the other end of those edges.
+
+* **how to limit the depth** for g.V().as('vertex').bothE().as('edge').bothV().as('related_vertex').select('vertex', 'edge', 'related_vertex')
+```shell
+g.V().as('vertex')
+  .repeat(bothE().as('edge').bothV().as('related_vertex'))
+  .times(2)
+  .select('vertex', 'edge', 'related_vertex')
+```
+- repeat(bothE().as('edge').bothV().as('related_vertex')): This part of the query is repeated.
+- times(2): This limits the repetition to 2 times, effectively setting your depth to 2.

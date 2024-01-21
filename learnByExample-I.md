@@ -52,7 +52,8 @@ g.V().hasLabel('transaction').has('amount', gt(2000)).as('tx')\
 ```
 
 ## has step in Gremlin
-The has step in Gremlin can be used to filter vertices (or edges) based on either labels or properties, depending on the arguments you provide to it. It's a versatile step that allows you to narrow down your traversal to specific elements that match certain criteria.
+The has step in Gremlin can be used to filter vertices (or edges) based on either labels or properties, depending on the arguments you provide to it. 
+It's a versatile step that allows you to narrow down your traversal to specific elements that match certain criteria.
 
 ### When has Uses Label
 - When you provide a single argument to the has step, it is typically used to filter by label.
@@ -64,11 +65,15 @@ The has step in Gremlin can be used to filter vertices (or edges) based on eithe
 - If you use two arguments, like g.V().has('code', 'JFK'), it will return all vertices (regardless of their label) where the property 'code' is 'JFK'.
 
 ## Gremlin OutE
-In Gremlin, the outE() step is used in a traversal to navigate from a vertex to its outgoing edges. Essentially, it helps you to move from a vertex to the edges that the vertex has directed away from it.
+In Gremlin, the outE() step is used in a traversal to navigate from a vertex to its outgoing edges. Essentially, it helps you to move from a vertex to the edges 
+that the vertex has directed away from it.
 
-- Starting Point - Vertex: The traversal begins at a vertex (or vertices) you've specified or filtered. This can be a single vertex, a set of vertices, or vertices filtered based on certain criteria.
-- Traversal to Outgoing Edges: By applying the outE() step, you move from the vertex to its outgoing edges. These are the edges where the vertex is the "outgoing" or "source" vertex.
-- Filtering (Optional): You can filter these edges by their label or properties. For example, outE('knows') would move to all outgoing edges with the label 'knows'.
+- Starting Point - Vertex: The traversal begins at a vertex (or vertices) you've specified or filtered. This can be a single vertex, a set of vertices,
+or vertices filtered based on certain criteria.
+- Traversal to Outgoing Edges: By applying the outE() step, you move from the vertex to its outgoing edges. These are the edges where the vertex 
+is the "outgoing" or "source" vertex.
+- Filtering (Optional): You can filter these edges by their label or properties. For example, outE('knows') would move to all outgoing edges
+with the label 'knows'.
 
 Example:
 ```groovy
@@ -83,7 +88,8 @@ g.V().hasLabel('person').outE('knows')
 - .outE('knows'): For each of those person vertices, filert all their outgoing edges for edge label 'knows'
 
 ## inV()
-the inV() step is used in a traversal to navigate from an edge to the vertex at the "in" side of the edge. This step allows you to traverse from an edge to the vertex where the edge is pointing to, also known as the destination or target vertex of the edge.
+the inV() step is used in a traversal to navigate from an edge to the vertex at the "in" side of the edge. This step allows you to traverse from an edge
+to the vertex where the edge is pointing to, also known as the destination or target vertex of the edge.
 Example:
 ```groovy
 // Assuming g is your graph traversal source
