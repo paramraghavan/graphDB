@@ -10,7 +10,7 @@ import random
 graph = Graph()
 remoteConn = DriverRemoteConnection('ws://localhost:8182/gremlin','g')
 g = graph.traversal().withRemote(remoteConn)
-
+vertex_label = 'airport::vertex'
 """
 With In memory TinkerGraph, you can use Long data type as an identifier for a vertex and edge
 """
@@ -21,18 +21,19 @@ def load_airports(file_path):
         vertex_id = 40000
         for row in reader:
             vertex_id = vertex_id + 1
-            g.addV('airport').property(T.id, vertex_id).property('code', row['code']).property('name', row['name']).next()
+            g.addV(vertex_label).property(T.id, vertex_id).property('code', row['code']).property('name', row['name']).next()
 
 # Function to load routes
 def load_routes(file_path):
+    edge_label = 'route::edge'
     with open(file_path, 'r') as file:
         reader = csv.DictReader(file)
         edge_id = 50000
         for row in reader:
             edge_id = edge_id + 1
-            from_airport = g.V().has('airport', 'code', row['from']).next()
-            to_airport = g.V().has('airport', 'code', row['to']).next()
-            g.V(from_airport).addE('route').property(T.id, edge_id).to(to_airport).property('miles', int(row['miles'])).iterate()
+            from_airport = g.V().has(vertex_label, 'code', row['from']).next()
+            to_airport = g.V().has(vertex_label, 'code', row['to']).next()
+            g.V(from_airport).addE(edge_label).property(T.id, edge_id).to(to_airport).property('miles', int(row['miles'])).iterate()
 
 # Load airports and routes
 load_airports('./airports.csv')
