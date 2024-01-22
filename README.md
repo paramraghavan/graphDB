@@ -2,6 +2,22 @@
 Apache TinkerPop is an open-source project providing a framework and a set of tools to unify different graph technologies under a common framework and language has made it a cornerstone in the field of graph computing. TinkerPop defines both a graph computing framework and a query language called Gremlin.
 
 
+# Why Graph database
+Here are the 3 main reasons:
+* **Efficient Relationship Processing**: Graph databases are designed to handle interconnected data. They excel in managing relationships 
+between data points, making them ideal for use cases where relationships are as important as the data itself. For example, social networks,
+recommendation engines, and fraud detection systems heavily rely on the relationships between various entities. In a graph database, 
+traversing these relationships is much faster and more efficient than in traditional relational databases.
+* **Flexibility in Evolving Schemas**: Graph databases typically don’t require a fixed schema, meaning they are more adaptable to changes 
+in data structures. This flexibility is beneficial in scenarios where data and relationships are constantly evolving, such as in 
+content management systems or in scenarios involving unstructured data. This schema-less nature allows for easier integration of new
+types of data and relationships without the need for extensive database redesign.
+* **Intuitive Data Modeling and Visualization**: The graph model is often more intuitive for representing complex relationships and networks 
+of data. This can make it easier for developers and data scientists to model and visualize complex structures, like supply chains or network 
+topologies. Graph databases can help in understanding these structures more deeply and in identifying patterns and insights that might be 
+less apparent in traditional tabular data representations.
+
+
 # Installing Apache TinkerPop on a Mac
 - TinkerPop requires Java to be installed on your system. You can check if Java is already installed and what version it is by running
 ```shell
