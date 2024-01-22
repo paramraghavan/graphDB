@@ -8,15 +8,29 @@ Here are the 3 main reasons:
 between data points, making them ideal for use cases where relationships are as important as the data itself. For example, social networks,
 recommendation engines, and fraud detection systems heavily rely on the relationships between various entities. In a graph database, 
 traversing these relationships is much faster and more efficient than in traditional relational databases.
+* **Direct Representation of Relationships**: In graph databases, an edge is a direct and explicit representation of a relationship between two nodes. 
+This means that each connection or relation is its own entity, often with its own properties and attributes. For instance, in a social network graph, 
+an edge might not only connect two people (nodes) but also carry information like the type of relationship (“friend,” “colleague”) and the date it was established.
 * **Flexibility in Evolving Schemas**: Graph databases typically don’t require a fixed schema, meaning they are more adaptable to changes 
 in data structures. This flexibility is beneficial in scenarios where data and relationships are constantly evolving, such as in 
 content management systems or in scenarios involving unstructured data. This schema-less nature allows for easier integration of new
 types of data and relationships without the need for extensive database redesign.
+  * The first-class nature of edges allows for more flexibility in data modeling. Relationships are not confined to rigid table structures and can evolve over time
+  without the need for significant schema changes, which is often a limitation in relational databases relying on foreign keys.
 * **Intuitive Data Modeling and Visualization**: The graph model is often more intuitive for representing complex relationships and networks 
 of data. This can make it easier for developers and data scientists to model and visualize complex structures, like supply chains or network 
 topologies. Graph databases can help in understanding these structures more deeply and in identifying patterns and insights that might be 
 less apparent in traditional tabular data representations.
+* **Attributes and Properties**: Unlike foreign keys in relational databases, which primarily serve as references or links between tables, edges in graph databases 
+can hold various attributes. This allows for more nuanced and detailed descriptions of the relationships between nodes
 
+In graph databases, edges are treated as “first-class citizens,” which means they are given as much importance and functionality as other elements like nodes or vertices. 
+This contrasts with how relationships are typically handled in relational databases, where they are often represented indirectly through foreign keys.
+
+**Summary:**
+Graph databases are ideal for scenarios where relationships are key, data is highly connected, schema flexibility is required, and where quick navigation through
+complex networks is essential. However, for applications with simpler, less interconnected data, or where the primary need is to store large volumes of data with 
+simple retrieval, traditional relational databases or other NoSQL databases might be more suitable.
 
 # Installing Apache TinkerPop on a Mac
 - TinkerPop requires Java to be installed on your system. You can check if Java is already installed and what version it is by running
