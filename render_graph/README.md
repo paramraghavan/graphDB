@@ -21,11 +21,16 @@ conda env create -f ./neptune_graph_viz.yaml
 conda activate neptune_graph_viz
 ## one time
 pip install graph-notebook
-# one time Install and Enable Jupyter Extensions: graph-noteboo
+pip install ipywidgets
+jupyter nbextension enable --py widgetsnbextension
+# one time Install and Enable Jupyter Extensions: graph-notebook
+# following does not work
 jupyter nbextension install --py --sys-prefix graph_notebook.widgets
-jupyter nbextension enable --py --sys-prefix graph_notebook.widgets
 # end one time
 
+## Reference for graph notebook
+- https://github.com/aws/graph-notebook?tab=readme-ov-file
+- https://github.com/aws/graph-notebook?tab=readme-ov-file#installation
 
 # To deactivate an active environment, use
 #
@@ -41,6 +46,54 @@ Once ipykernel is installed, you can create a Jupyter kernel for your Conda envi
 ```shell
 # python -m ipykernel install --user --name your_environment_name --display-name "Your Environment Name"
 python -m ipykernel install --user --name neptune_graph_viz --display-name "Neptune Graph Viz"
+
+```
+
+## Jupyter Classic Notebook
+Begin by installing graph-notebook and its prerequisites, then follow the remaining instructions for either Jupyter Classic Notebook or JupyterLab.
+```shell
+# install the package
+pip install graph-notebook
+```
+```shell
+# Enable the visualization widget
+jupyter nbextension enable  --py --sys-prefix graph_notebook.widgets
+
+# copy static html resources
+python -m graph_notebook.static_resources.install
+python -m graph_notebook.nbextensions.install
+
+# copy premade starter notebooks
+python -m graph_notebook.notebooks.install --destination ~/notebook/destination/dir
+
+# create nbconfig file and directory tree, if they do not already exist
+mkdir ~/.jupyter/nbconfig
+touch ~/.jupyter/nbconfig/notebook.json
+
+# start jupyter notebook
+python -m graph_notebook.start_notebook --notebooks-dir ~/notebook/destination/dir
+```
+
+# connect to local server
+```graph_notebook
+%%graph_notebook_config
+{
+  "host": "localhost",
+  "port": 8182,
+  "ssl": false,
+  "gremlin": {
+    "traversal_source": "g",
+    "username": "",
+    "password": "",
+    "message_serializer": "graphsonv3"
+  }
+}
+
+# execute gremlin
+%%gremlin 
+g.V().count()
+```
+
 
 ```
 
