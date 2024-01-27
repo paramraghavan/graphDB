@@ -35,7 +35,7 @@ simple retrieval, traditional relational databases or other NoSQL databases migh
 # Installing Apache TinkerPop on a Mac
 - TinkerPop requires Java to be installed on your system. You can check if Java is already installed and what version it is by running
 ```shell
-brew install openjdk
+brew install openjdk@17 # use jdk 17. Tinker pop 3.7.1 supports Java8,Java 11 and Java17
 ```
 - Download the TinkerPop Binary: Go to the [Apache TinkerPop download](https://tinkerpop.apache.org/download.html) page and download the latest binary release
 - https://www.apache.org/dyn/closer.lua/tinkerpop/3.7.1/apache-tinkerpop-gremlin-console-3.7.1-bin.zip
@@ -209,6 +209,9 @@ This query does the following:
   * Optimization strategies used (e.g., filter optimization, index usage).
   * The order in which steps are executed, which might differ from the order in which they are written due to optimizations.
 
+
+## Setup python neptune environment
+- [Setup Env for Neptune](./render_graph/README.md)
 
 ## Useful links
 - https://github.com/aws/graph-notebook
