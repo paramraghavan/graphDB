@@ -92,6 +92,16 @@ python -m graph_notebook.start_notebook --notebooks-dir ~/notebook/destination/d
 # execute gremlin
 %%gremlin 
 g.V().count()
+
+%%gremlin 
+g.V().out().limit(5).path()
+
+%%gremlin 
+g.V().outE().inV().path().limit(5)
+
+%%gremlin 
+g.V().repeat(out()).times(5).path()
+
 ```
 
 
