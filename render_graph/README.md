@@ -102,6 +102,9 @@ g.V().outE().inV().path().limit(5)
 %%gremlin 
 g.V().repeat(out()).times(5).path()
 
+%%gremlin 
+g.V().outE().inV().path()
+
 ```
 
 
