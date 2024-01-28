@@ -112,17 +112,18 @@ for path in results:
 
 
 ## outE() vs out()
-> outE():
-* outE() is typically used in graph databases or graph traversal frameworks to retrieve the outgoing edges of a vertex or node.
-* It returns all the edges that originate from the vertex, providing information about the relationships the vertex has with other vertices.
-* This function returns a collection or list of outgoing edges as its result.
+**outE()**
+- outE() is typically used in graph databases or graph traversal frameworks to retrieve the outgoing edges of a vertex or node.
+- It returns all the edges that originate from the vertex, providing information about the relationships the vertex has with other vertices.
+- This function returns a collection or list of outgoing edges as its result.
 
-> out():
-* out() is used to retrieve the neighboring vertices that are connected to the current vertex via outgoing edges.
-* It returns all the vertices that can be reached by following the outgoing edges from the current vertex.
-* This function returns a collection or list of neighboring vertices as its result.
+**out()**
+- out() is used to retrieve the neighboring vertices that are connected to the current vertex via outgoing edges.
+- It returns all the vertices that can be reached by following the outgoing edges from the current vertex.
+- This function returns a collection or list of neighboring vertices as its result.
 
-'''css
+
+```text
 Vertex A
   |
   |--Edge1---> Vertex B
@@ -130,7 +131,94 @@ Vertex A
   |--Edge2---> Vertex C
   |
   |--Edge3---> Vertex D
-'''
 
+```
 * If you use outE() on Vertex A, it will return [Edge1, Edge2, Edge3].
 * If you use out() on Vertex A, it will return [Vertex B, Vertex C, Vertex D].
+
+
+## repeat and Until
+In Gremlin, the repeat step is used for iterative traversal in a graph database. It allows you to perform a sequence of traversal
+steps multiple times until a specified condition is met. The until step is often used in conjunction with repeat to define the 
+termination condition.
+
+```textmate
+Vertex: New York
+Vertex: Boston
+Vertex: Philadelphia
+Vertex: Washington D.C.
+
+Edge: New York - Road -> Boston
+Edge: New York - Road -> Philadelphia
+Edge: Philadelphia - Road -> Washington D.C.
+Edge: Boston - Road -> Philadelphia
+```
+
+Find all the cities that can be reached from New York by following roads until you reach a city that starts with the letter "W." 
+You can use repeat to achieve this:
+```groovy
+g.V().has('name', 'New York').repeat(out('Road').simplePath()).until(has('name', startingWith('W'))).values('name')
+
+```
+- g.V().has('name', 'New York') starts the traversal at the New York vertex.
+- repeat(out('Road').simplePath()) repeats the traversal step of going out on 'Road' edges while ensuring that we follow a simple path (avoiding revisiting vertices to prevent infinite loops).
+- until(has('name', startingWith('W'))): The until step defines the termination condition, which is when we reach a city whose name starts with 'W'.
+- values('name') retrieves the names of the cities in the result.
+
+In this case, it would return **"New York," "Philadelphia," and "Washington D.C."**
+
+## repeat and times
+Suppose you have a graph with vertices representing locations and edges representing routes between them. 
+You want to find all locations that can be reached from a starting location by following routes up to a maximum of 3 hops. 
+You can use repeat with times to achieve this:
+```groovy
+g.V().has('name', 'Start Location')
+  .repeat(out()).times(3)
+  .values('name')
+```
+
+## repeat and emit
+A graph with vertices representing locations and edges representing routes between them. You want to find all locations reachable 
+from a starting location by following routes, and you want to emit the locations at each step of the traversal until you reach a 
+location with a certain property (e.g., a location with the property 'end' set to true). 
+
+You can use repeat with emit to achieve this:
+```gremlin
+g.V().has('name', 'Start Location')
+  .emit() // Emit the starting location
+  .repeat(out())
+  .has('end', true) // Termination condition: Reach a location with 'end' property set to true
+  .emit() // Emit the location that meets the termination condition
+  .values('name')
+```
+
+- g.V().has('name', 'Start Location') starts the traversal at the vertex with the name 'Start Location'.
+- .emit() emits the starting location, ensuring that it's included in the result.
+- .repeat(out()) specifies that you want to repeat the traversal step of going out on any edge (out()).
+- .has('end', true) defines the termination condition, which is when you reach a location with the 'end' property set to true.
+- .emit() emits the location that meets the termination condition.
+- .values('name') retrieves the names of the locations in the result.
+
+
+## path()
+
+```gremlin
+# Understanding Traversals:
+g.V().hasLabel('Person').out('knows').hasLabel('Person').path().limit(5)
+
+# Finding Paths:
+g.V().has('name', 'A').repeat(out()).until(has('name', 'D')).path()
+
+# Analyzing Relationships:
+g.V().has('name', 'Alice').outE().inV().path()
+
+# Finding Shortest Paths:
+g.V().has('name', 'A').repeat(out().simplePath()).until(has('name', 'D')).path().limit(1)
+
+```
+
+## Generic gremlin query to be used for visualizing the graph
+
+```gremlin
+g.V().outE().inV().project('source', 'target', 'edgeProperty').by(id()).by('property').path()
+```
