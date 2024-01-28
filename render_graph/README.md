@@ -19,18 +19,6 @@ $ ~/miniconda.sh -b -p $HOME/miniconda
 # This command creates an environment based on the dependencies listed in the "environment.yml" - neptune_graph_viz.yaml file.
 conda env create -f ./neptune_graph_viz.yaml
 conda activate neptune_graph_viz
-## one time
-pip install graph-notebook
-pip install ipywidgets
-jupyter nbextension enable --py widgetsnbextension
-# one time Install and Enable Jupyter Extensions: graph-notebook
-# following does not work
-jupyter nbextension install --py --sys-prefix graph_notebook.widgets
-# end one time
-
-## Reference for graph notebook
-- https://github.com/aws/graph-notebook?tab=readme-ov-file
-- https://github.com/aws/graph-notebook?tab=readme-ov-file#installation
 
 # To deactivate an active environment, use
 #
@@ -49,11 +37,13 @@ python -m ipykernel install --user --name neptune_graph_viz --display-name "Nept
 
 ```
 
+
 ## Jupyter Classic Notebook
 Begin by installing graph-notebook and its prerequisites, then follow the remaining instructions for either Jupyter Classic Notebook or JupyterLab.
 ```shell
 # install the package
 pip install graph-notebook
+pip install ipywidgets
 ```
 ```shell
 # Enable the visualization widget
@@ -107,16 +97,10 @@ g.V().outE().inV().path()
 
 ```
 
+## Reference for graph notebook
+- https://github.com/aws/graph-notebook?tab=readme-ov-file
+- https://github.com/aws/graph-notebook?tab=readme-ov-file#installation
 
-```
-
-## start jupyter notebook
-When Jupyter Notebook opens in your web browser, you should see the newly created kernel available in the "Kernel" menu under "Change kernel."
-Inside your Jupyter Notebook, open the notebook where you want to use the Conda environment. In the top menu, click "Kernel" and select the kernel associated with your Conda environment
-
-```shell
-jupyter notebook
-```
 
 ## The generated graph with Lables for Vertices and edges
 ![Unknown](https://github.com/paramraghavan/tinkerpop/assets/52529498/8372ae04-454e-4aca-bd1d-176f191bd996)
