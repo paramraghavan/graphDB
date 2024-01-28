@@ -113,9 +113,9 @@ for path in results:
 
 ## outE() vs out()
 **outE()**
-- outE() is typically used in graph databases or graph traversal frameworks to retrieve the outgoing edges of a vertex or node.
-- It returns all the edges that originate from the vertex, providing information about the relationships the vertex has with other vertices.
-- This function returns a collection or list of outgoing edges as its result.
+* outE() is typically used in graph databases or graph traversal frameworks to retrieve the outgoing edges of a vertex or node.
+* It returns all the edges that originate from the vertex, providing information about the relationships the vertex has with other vertices.
+* This function returns a collection or list of outgoing edges as its result.
 
 **out()**
 - out() is used to retrieve the neighboring vertices that are connected to the current vertex via outgoing edges.
@@ -218,7 +218,27 @@ g.V().has('name', 'A').repeat(out().simplePath()).until(has('name', 'D')).path()
 ```
 
 ## Generic gremlin query to be used for visualizing the graph
+Creating a generic Gremlin query for visualizing a graph depends on various factors, including the specific graph database you're using, 
+the visualization tools available, and your requirements. However, I can provide you with a basic template for a Gremlin query that you can 
+adapt and enhance for your needs.
+
+You can then take the extracted data and use it with a visualization library or tool of your choice (e.g., GraphViz, D3.js, or Gephi) to 
+create visual representations of the graph.
 
 ```gremlin
-g.V().outE().inV().project('source', 'target', 'edgeProperty').by(id()).by('property').path()
+// Start the traversal from a specific vertex or with a specific condition
+g.V().has('property', 'value')
+  .outE()  // Traverse outgoing edges
+  .inV()   // Traverse to neighboring vertices
+  .project('source', 'target', 'edgeProperty')  // Extract relevant data for visualization
+    .by(id())          // Extract the ID of the source vertex
+    .by(inV().id())    // Extract the ID of the target vertex
+    .by('property')    // Extract properties of the edge
+  .toList()
+```
+
+```gremlin
+g.V().outE().inV().project('source', 'target', 'edgeProperty').by(id()).by(out().id()).by('property').path()
+
+g.V().outE().inV().path()
 ```
