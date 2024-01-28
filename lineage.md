@@ -142,7 +142,7 @@ In Gremlin, the repeat step is used for iterative traversal in a graph database.
 steps multiple times until a specified condition is met. The until step is often used in conjunction with repeat to define the 
 termination condition.
 
-```textmate
+```gremlin
 Vertex: New York
 Vertex: Boston
 Vertex: Philadelphia
@@ -156,7 +156,7 @@ Edge: Boston - Road -> Philadelphia
 
 Find all the cities that can be reached from New York by following roads until you reach a city that starts with the letter "W." 
 You can use repeat to achieve this:
-```groovy
+```gremlin
 g.V().has('name', 'New York').repeat(out('Road').simplePath()).until(has('name', startingWith('W'))).values('name')
 
 ```
