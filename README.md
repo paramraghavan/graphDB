@@ -209,6 +209,15 @@ This query does the following:
   * Optimization strategies used (e.g., filter optimization, index usage).
   * The order in which steps are executed, which might differ from the order in which they are written due to optimizations.
 
+## Neptune mulitple label support
+Neptune supports multiple labels for a vertex. When you create a label, you can specify multiple labels by separating them with ::. 
+For example, g.addV("Label1::Label2::Label3") adds a vertex with three different labels. The hasLabel step matches this vertex 
+with any of those three labels: hasLabel("Label1"), hasLabel("Label2"), and hasLabel("Label3").
+
+>> The :: delimiter is reserved for this use only. You cannot specify multiple labels in the hasLabel step.
+>> For example, hasLabel("Label1::Label2") does not match anything.
+
+ref: https://docs.aws.amazon.com/neptune/latest/userguide/access-graph-gremlin-differences.html
 
 ## Setup python neptune environment
 - [Setup Env for Neptune](./render_graph/README.md)
@@ -216,3 +225,4 @@ This query does the following:
 ## Useful links
 - https://github.com/aws/graph-notebook
 - https://github.com/aws/graph-notebook.git
+- https://docs.aws.amazon.com/neptune/latest/userguide/access-graph-gremlin-differences.html
