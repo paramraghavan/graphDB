@@ -123,7 +123,7 @@ for path in results:
 - This function returns a collection or list of neighboring vertices as its result.
 
 
-```text
+```
 Vertex A
   |
   |--Edge1---> Vertex B
@@ -241,4 +241,60 @@ g.V().has('property', 'value')
 g.V().outE().inV().project('source', 'target', 'edgeProperty').by(id()).by(out().id()).by('property').path()
 
 g.V().outE().inV().path()
+```
+
+## fold
+The fold() step in Gremlin is used to aggregate the results of a traversal into a list. It's especially useful when you want to convert a 
+stream of elements into a single collection. 
+
+
+* g.V().hasLabel('person'): Select all vertices with the label 'person'.
+* values('name'): Extract the 'name' property from these vertices.
+* fold(): Aggregate all the names into a list.
+* 
+```gremlin
+g.V().hasLabel('airport').values('name').fold()
+#output
+['Los Angeles International Airport', 'John F. Kennedy International Airport', 'Hartsfield-Jackson Atlanta International Airport',...]
+
+```
+
+### Counting Elements with fold()
+
+* g.V().hasLabel('airport'): Select all vertices labeled as 'airport'.
+* out('route'): Traverse to the vertices that each airport route to destination.
+* fold(): Aggregate these routes into a list for each airport.
+* count(local): Count the number of elements in each list.
+
+```gremlin 
+g.V().hasLabel('airport').out('route').fold().count(local)
+```
+
+### Creating a Map of Vertex Properties
+* g.V(): Select all vertices.
+* group(): Group the results.
+* by(id): Use the vertex ID as the key.
+* by(valueMap().fold()): Use a map of all properties as the value, aggregated into a list.
+
+```gremlin
+g.V().group().by(id).by(valueMap().fold())
+#output
+{40001: [{'code': ['LAX'], 'name': ['Los Angeles International Airport']}], 40002: [{'code': ['JFK'], ...,  40025: [{'code': ['SYD'], 'name': ['Sydney Airport']}]}
+```
+
+## show all the properties of vertices and edges
+
+```gremlin
+# show all the properties of vertices 
+# g.V() selects all vertices.
+# valueMap() fetches the properties of these vertices.
+# with(WithOptions.tokens) includes the vertex IDs and labels in the output.
+g.V().valueMap().with(WithOptions.tokens)
+
+# show all the properties of edges
+# g.E() selects all edges.
+# valueMap() fetches the properties of these edges.
+# with(WithOptions.tokens) includes the edge IDs and labels in the output.
+g.E().valueMap().with(WithOptions.tokens)
+
 ```
