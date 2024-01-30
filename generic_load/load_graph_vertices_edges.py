@@ -19,11 +19,11 @@ remoteConn = DriverRemoteConnection(f'ws://{neptune_host}:{neptune_port}/gremlin
 g = traversal().withRemote(remoteConn)
 
 
-vertices, edges = load_graph_from_yaml('data.yaml')
+vertices, edges, id_map = load_graph_from_yaml('data.yaml')
 
 # Adding vertices with properties
 for vertex in vertices:
-    v = g.addV(vertex['label']).property('id', vertex['id'])
+    v = g.addV(vertex['label']).property('id', id_map[vertex['id']])
     for prop, value in vertex['properties'].items():
         v.property(prop, value)
     v.next()
@@ -38,7 +38,7 @@ execute the traversal.
 
 # Adding edges
 for edge in edges:
-    e = g.V(edge['from']).addE(edge['label']).to(__.V(edge['to']))
+    e = g.V(id_map[edge['from']]).addE(edge['label']).to(__.V(id_map[edge['to']]))
     for prop, value in edge.get('properties', {}).items():
         e.property(prop, value)
     e.iterate()

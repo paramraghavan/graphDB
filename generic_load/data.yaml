@@ -2,13 +2,18 @@ vertices:
   - id: 1
     label: 'person'
     properties:
-      name: 'Alice'
+      name: 'Alica'
       age: 30
   - id: 2
     label: 'person'
     properties:
-      name: 'Bob'
+      name: 'Michael'
       age: 35
+  - id: 3
+    label: 'person'
+    properties:
+      name: 'Ram'
+      age: 33
 
 edges:
   - from: 1
@@ -16,3 +21,8 @@ edges:
     label: 'knows'
     properties:
       since: '2020'
+  - from: 2
+    to: 3
+    label: 'colleagues'
+    properties:
+      since: '2016'
