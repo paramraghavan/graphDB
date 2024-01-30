@@ -20,7 +20,7 @@ g = traversal().withRemote(remoteConn)
 
 
 vertices, edges, id_map = load_graph_from_yaml('data.yaml')
-
+"""
 # Adding vertices with properties
 for vertex in vertices:
     v = g.addV(vertex['label']).property('id', id_map[vertex['id']])
@@ -45,23 +45,27 @@ for edge in edges:
 
 # Don't forget to close the connection
 remoteConn.close()
-
 """
+
 # Function to add a vertex if it doesn't exist
 def add_vertex_if_not_exists(g, vertex):
-    if not g.V().has('id', vertex['id']).hasNext():
-        v = g.addV(vertex['label']).property('id', vertex['id'])
+    if not g.V().has('id', id_map[vertex['id']]).hasNext():
+        v = g.addV(vertex['label']).property('id', id_map[vertex['id']])
         for prop, value in vertex['properties'].items():
             v.property(prop, value)
         v.next()
+    else:
+        print(f'vertex already exists: {vertex}')
 
 # Function to add an edge if it doesn't exist
 def add_edge_if_not_exists(g, edge):
-    if not g.V(edge['from']).outE(edge['label']).where(__.inV().has('id', edge['to'])).hasNext():
-        g.V(edge['from']).addE(edge['label']).to(__.V(edge['to']))
+    if not g.V(id_map[edge['from']]).outE(edge['label']).where(__.inV().has('id', id_map[edge['to']])).hasNext():
+        e = g.V(id_map[edge['from']]).addE(edge['label']).to(__.V(id_map[edge['to']]))
         for prop, value in edge.get('properties', {}).items():
-            g.property(prop, value)
-        g.iterate()
+             e.property(prop, value)
+        e.iterate()
+    else:
+        print(f'edge already exists: {edge}')
 
 # Adding vertices and edges
 for vertex in vertices:
@@ -69,4 +73,7 @@ for vertex in vertices:
 
 for edge in edges:
     add_edge_if_not_exists(g, edge)
-"""
+
+# Don't forget to close the connection
+remoteConn.close()
+
