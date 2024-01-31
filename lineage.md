@@ -272,3 +272,7 @@ g.V().valueMap().with(WithOptions.tokens)
 g.E().valueMap().with(WithOptions.tokens)
 
 ```
+
+## next vs iterate
+- Use .next(), when you need the result (and you are expecting exactly one result)
+- Use .iterate(), when you don't need the result (typically mutation queries, that add/change properties, edges and/or vertices).

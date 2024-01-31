@@ -59,8 +59,8 @@ def add_vertex_if_not_exists(g, vertex):
 
 # Function to add an edge if it doesn't exist
 def add_edge_if_not_exists(g, edge):
-    if not g.V(id_map[edge['from']]).outE(edge['label']).where(__.inV().has('id', id_map[edge['to']])).hasNext():
-        e = g.V(id_map[edge['from']]).addE(edge['label']).to(__.V(id_map[edge['to']]))
+    if not g.V().has('id',id_map[edge['from']]).out(edge['label']).has('id', id_map[edge['to']]).hasNext():
+        e = g.V().has('id',id_map[edge['from']]).addE(edge['label']).to(__.V().has('id', id_map[edge['to']]))
         for prop, value in edge.get('properties', {}).items():
              e.property(prop, value)
         e.iterate()
