@@ -19,6 +19,8 @@ $ ~/miniconda.sh -b -p $HOME/miniconda
 # This command creates an environment based on the dependencies listed in the "environment.yml" - neptune_graph_viz.yaml file.
 conda env create -f ./neptune_graph_viz.yaml
 conda activate neptune_graph_viz
+# run the following when you update the yaml file
+# conda env update -f ./neptune_graph_viz.yaml
 
 # To deactivate an active environment, use
 #
