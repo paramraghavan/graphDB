@@ -915,6 +915,116 @@ g.V().has('airport','code',between('X','Xa')).
     values('code').fold()
 
 // Result
-
+[XNA,XMN,XRY,XIY,XUZ,XSB,XCH,XIL,XFN,XNN,XGR,XFW,XCR,XSC,XQP,XMH,XBJ,XAP,XMS,XKH,XIC,XTG,XKS,XBE,XTO]
 
 ```
+
+## Refining analysis using not, neq, within and without
+The following query finds routes from AUS to SYD with only one stop but ignores any routes that stop in DFW.
+```gremlin
+g.V().has('airport','code','AUS').
+    out().has('code',neq('DFW')).
+    out().has('code','SYD').path().by('code')
+    
+// Flights to Sydney avoiding DFW and LAX
+g.V().has('airport','code','AUS').
+        out().and(has('code',neq('DFW')),has('code',neq('LAX'))).
+        out().has('code','SYD').path().by('code')  
+// OR        
+// Flights to Sydney avoiding DFW and LAX
+g.V().has('airport','code','AUS').
+    out().has('code',without('DFW','LAX')).
+    out().has('code','SYD').path().by('code')
+ 
+// From SAT to SLC with a stop in any one of DFW,LAX,PHX or TUS
+g.V().has('airport','code','SAT').
+     out().has('code',within('DFW','LAX','PHX','TUS')).
+     out().has('code','SLC').path().by('code')       
+```
+
+## startingWith, endingWith, containing
+Here is a simple example that looks for unique city names that begin with an uppercase "X".
+```gremlin
+g.V().hasLabel('airport').
+        has('city',startingWith('X')).
+        values('city')
+```
+The example below looks for any city names ending with that characters "zhi".
+
+```gremlin
+  g.V().hasLabel('airport').
+        has('city',endingWith('zhi')).
+        values('city')
+        
+  g.V().hasLabel('airport').
+        has('city',containing('gzh')).
+        values('city')        
+```
+
+## Sorting
+You can use order to sort things in either ascending (the default) or descending order. Note that the sort does not have to be the last step of a query. It is perfectly OK to sort things in the middle of a query before moving on to a further step. We can see examples of that in the first two queries below. Note that the first query will return different results than the second one due to the placement of the limit step. I used fold at the end of the query to collect all of the results into a list.
+
+```gremlin
+ // Sort the first 20 airports returned in ascending order
+ g.V().hasLabel('airport').limit(20).values('code').order().fold()
+// [ANC,ATL,AUS,BNA,BOS,BWI,DCA,DFW,FLL,IAD,IAH,JFK,LAX,LGA,MCO,MIA,MSP,ORD,PBI,PHX]
+```
+Here we perform the limit step after the order step.
+```gremlin
+// Sort all of the airports in the graph by their code and then return the first 20
+  g.V().hasLabel('airport').order().by('code').limit(20).values('code').fold()
+  [AAE,AAL,AAN,AAQ,AAR,AAT,AAX,AAY,ABA,ABB,ABD,ABE,ABI,ABJ,ABL,ABM,ABQ,ABR,ABS,ABT]
+```
+We find all of the places you can fly to from Austin (AUS) and sort the results as before, using the airport’s IATA code, 
+but this time we also include the ICAO code for each airport in the result set.
+```gremlin
+ g.V().has('code','AUS').out().order().by('code').
+                    values('code','icao').fold()
+ // REsult
+  [ABQ,KABQ,ATL,KATL,BKG,KBBG,BNA,KBNA,BOS,KBOS,BWI,KBWI,CLE,KCLE,CLT,KCLT,CUN,MMUN,CVG,
+  KCVG,DAL,KDAL,DCA,KDCA,DEN,KDEN,DFW,KDFW,DTW,KDTW,ELP,KELP,EWR,KEWR,FLL,KFLL,FRA,EDDF,
+  GDL,MMGL,HOU,KHOU,HRL,KHRL,IAD,KIAD,IAH,KIAH,IND,KIND,JFK,KJFK,LAS,KLAS,LAX,KLAX,LBB,K
+  LBB,LGB,KLGB,LHR,EGLL,MCI,KMCI,MCO,KMCO,MDW,KMDW,MEM,KMEM,MEX,MMMX,MIA,KMIA,MSP,KMSP,M
+  SY,KMSY,OAK,KOAK,ORD,KORD,PDX,KPDX,PHL,KPHL,PHX,KPHX,PIE,KPIE,PIT,KPIT,PNS,KPNS,RDU,KR
+  DU,SAN,KSAN,SEA,KSEA,SFB,KSFB,SFO,KSFO,SJC,KSJC,SLC,KSLC,SNA,KSNA,STL,KSTL,TPA,KTPA,VP
+  S,KVPS,YYZ,CYYZ]                   
+```
+
+By default a sort performed using order returns results in ascending order. To obtain results in descending order 
+instead, desc can be specified using a by modulator. Likewise, asc can be used to make it clear that sorting 
+in ascending order is required.
+```gremlin
+// Sort the first 20 airports returned in descending order
+g.V().hasLabel('airport').limit(20).values('code').order().by(desc).fold()
+//[PHX,PBI,ORD,MSP,MIA,MCO,LGA,LAX,JFK,IAH,IAD,FLL,DFW,DCA,BWI,BOS,BNA,AUS,ATL,ANC]
+```
+You can also sort things into a random order using shuffle. 
+```gremlin
+g.V().hasLabel('airport').limit(20).values('code').order().by(shuffle).fold()
+//[MCO,LGA,BWI,IAD,ATL,BOS,DCA,BNA,IAH,DFW,MIA,MSP,ANC,AUS,JFK,ORD,PBI,FLL,LAX,PHX]
+```
+
+## Sorting by key or value
+Sometimes, when the results of a query are a set of one or more key:value pairs, we need to sort by either the key or the value in either ascending or descending order. Gremlin offers us ways that we can control the sort in these cases
+
+The following example shows the difference between running a query with and without the use of order to sort using the keys of the map created by the group step.
+```gremlin
+// Query but do not order
+g.V().hasLabel('airport').limit(5).group().by('code').by('runways')
+// [BNA:[4],ANC:[3],BOS:[6],ATL:[5],AUS:[2]]
+```
+Notice also how **local** is used as a parameter to order. **This is required so that the ordering is done while the final 
+list is being constructed**. _If you do not specify local then order will have no effect as it will be applied to the 
+entire result which is treated as a single entity at that point._
+
+```gremlin pg 90
+// Query and order by airport code (the key)
+  g.V().hasLabel('airport').limit(5).
+        group().by('code').by('runways').
+        order(local).by(keys,asc)
+// [ANC:[3],ATL:[5],AUS:[2],BNA:[4],BOS:[6]]
+```
+
+
+
+>> Referenced from https://kelvinlawrence.net/book/PracticalGremlin.pdf
