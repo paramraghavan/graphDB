@@ -1077,4 +1077,6 @@ entire result which is treated as a single entity at that point._
 
 
 
->> Referenced from https://kelvinlawrence.net/book/PracticalGremlin.pdf
+>> References:
+> https://kelvinlawrence.net/book/PracticalGremlin.pdf
+> https://blog.contactsunny.com/data-science/out-vs-oute-janusgraph-and-gremlin
