@@ -210,7 +210,54 @@ and an edge are considered **incident** if they are connected to each other.
 | inV    | Incoming vertex.                                 |
 | otherV | The vertex that was not the vertex we came from. |
 
- 
+
+### out() vs. outE()
+![img_1.png](img_1.png)
+
+In the graph above, we have four vertices and three edges. The vertex in the middle with the property "name": "sunny" is
+the vertex from where we'll start our traversal. The other three vertices are the items that I bought from an e-commerce
+website. They are a smartphone, a laptop, and a monitor. The relationship is represented with edges labelled bought.
+
+The edges have another property called count, and as you can tell, they represent the number of times I have bought
+these items. So I bought three smartphones, two laptops, and one monitor.
+
+Get a reference to our starting vertex with the following query:
+```gremlin
+sunny = g.V().has('name', 'sunny').next()
+```
+
+We know that we use the outE(), an outgoing incident edge, to traverse an edge that is going out of the current vertex.
+We pass in the label- **bought** of one or more edges to the function. If I want to get all the items
+that I have bought, I’ll run the following query:
+
+```gremlin
+g.V(sunny).outE('bought').in()
+```
+Above will give all the items brought by sunny.
+
+But you can also use the following query for the same use case:
+```gremlin
+g.V(sunny).out('bought')
+```
+When you’re using the outE().in() combination, you can simply replace it with out(). It's a shorthand or an alias for
+the long form outE().in(). But then, why would you use outE() at all?
+
+Suppose you want to filter or limit the traversal based on other properties of the edge. For example, in our sample
+graph, I want to get only the items that have bought more than once. We have the count property for each of our bought
+edge. We can use that to filter our vertices. For this, the query is as follows:
+
+```gremlin
+g.V(sunny).outE('bought').has('count', gt(1)).inV()
+```
+
+As you can see, we can use the has() function on edges as well to filter out edges with particular property. This
+ability to filter is not available when you use the out() function. Because the result of the out() function is
+vertices. So if you call the has() function on that result, you'll be filtering on the vertices and not edges.
+
+### in() vs. inE()
+It’s the same story with the in() and inE() functions as well. If you want to filter edges based on extra properties,
+you use the inE() function instead of in().
+
 ## What vertices and edges did I visit? - Introducing path
  After you have done some graph walking using a query you can use path to get a summary back of where you went
  
