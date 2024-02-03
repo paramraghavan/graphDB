@@ -157,6 +157,9 @@ g.V().groupCount().by(label)
 g.V().label().groupCount()
 // As above but using group()
 g.V().group().by(label).by(count())
+// array of label types
+g.V().label().dedup()
+
    
 // How many of each type of edge are there?
 g.E().groupCount().by(label)
