@@ -98,6 +98,10 @@ supernode if we modelled that relationship by connecting every person vertex to 
 In such situations, it would be far more sensible to make the country where a person lives a property of their own
 vertex.**
 
+## Path Step Usage and Performance
 
+Using path steps specifically (e.g., path()) can impact performance because they require the traversal engine to keep
+track of the paths being traversed. This can increase the memory usage and computation time, especially for long paths
+or when many paths are being evaluated.
 
 >> Referenced from https://kelvinlawrence.net/book/PracticalGremlin.pdf

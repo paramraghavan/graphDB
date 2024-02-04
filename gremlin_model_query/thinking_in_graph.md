@@ -9,6 +9,12 @@ databases. All graph traversals start with either a g.V() or a g.E().
 - Filters and Conditions: Similar to WHERE clauses in SQL, but applied while traversing the graph.
 - Projection: Selecting specific properties of vertices or edges, similar to choosing columns in an SQL query.
 
+## SQL to Gremlin Analogies
+Here are some analogies to translate SQL concepts to Gremlin:
+
+- **SELECT**: In SQL, you select rows from a table. In Gremlin, you start a traversal (g.V(), g.E() for vertices and edges, respectively) and filter/select vertices or edges.
+- **WHERE**: Filtering is done in Gremlin using steps like has(), hasLabel(), and where() which are analogous to SQL's WHERE clause.
+- **JOIN**: Graph databases naturally represent relationships, so you don't need explicit JOINs. Traversing from one vertex to another via edges is inherently a "join" operation.
 
 ## SQL 
 **SQL Table**
@@ -90,8 +96,15 @@ In Gremlin, rather than joining tables, you traverse edges from one vertex to an
 have placed orders with a total greater than 100.
 ```gremlin
 // SELECT users.* FROM users JOIN orders ON users.id = orders.user_id WHERE orders.total > 100;
-g.V().hasLabel('user').out('placedOrder').has('total', gt(100));
+g.V().hasLabel('user').out('placedOrder').has('total', gt(100)); // assuming 'placedOrder' is the edge connecting users to orders
 ```
+Finds all 'user' vertices over age 30 and traverses the 'placedOrder' edges to the related 'order' vertices. The 
+concept of JOIN is naturally represented by traversing edges.
+```gremlin
+// SELECT * FROM users JOIN orders ON users.id = orders.user_id WHERE users.age > 30
+g.V().hasLabel('user').has('age', gt(30)).out('placedOrder')
+```
+
 
 ## Aggregations
 Aggregations like COUNT are straightforward in both SQL and Gremlin, with Gremlin queries often being more concise.
@@ -100,6 +113,15 @@ Aggregations like COUNT are straightforward in both SQL and Gremlin, with Gremli
 // SELECT COUNT(*) FROM users WHERE age > 30;
 g.V().has('age', gt(30)).count();
 ```
+
+## Subquery
+```gremlin
+// SELECT * FROM users WHERE user_id IN (SELECT user_id FROM orders WHERE order_date = '2023-01-01');
+// assuming 'placedOrder' is the edge connecting users to orders
+g.V().hasLabel('orders').has('order_date', '2023-01-01').in('placedOrder').dedup()
+
+```
+
 
 ## Grouping and Aggregation
 Gremlin allows grouping and aggregating through the group() step, which is flexible and powerful for aggregating 
