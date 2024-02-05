@@ -1,9 +1,8 @@
 # Gremlin and Neptune
 
 ## Gremlin Transactions in Neptune
- When working with Gremlin it is important to understand the context you are working within. Our requests most  likely 
- made using text-based Gremlin strings
-- Using the Java driver and Client.submit(string).
+ Our requests most  likely made using text-based Gremlin strings
+- Using the Java driver, Python driver and Client.submit(string).
 - Using the Gremlin console and :remote connect.
 - Using the HTTP API.
 - Request made via Gremlin python driver in gremlinpython library
@@ -18,6 +17,8 @@ statement other than the last must end with a next() step to be executed. Only t
 
 After TinkerPop 3.5.x, the transaction can be explicitly controlled and the session managed transparently. Gremlin
 Language Variants (GLV) support Gremlin's tx() syntax to commit() or rollback() a transaction as follows:
+
+## Using java driver
 ```java
 GraphTraversalSource g = traversal().withRemote(conn);
 
@@ -38,6 +39,7 @@ try {
 }
 ```
 ## Using python and ßgremlin_python library
+>> ref: https://tinkerpop.apache.org/docs/current/reference/#gremlin-python-transactions
 ```python
 from gremlin_python.process.anonymous_traversal import traversal
 from gremlin_python.driver.driver_remote_connection import DriverRemoteConnection
@@ -62,6 +64,53 @@ try:
         
 except Exception as e:
     print(f"An error occurred: {e}")
+```
+
+```python
+from gremlin_python.process.anonymous_traversal import traversal
+from gremlin_python.driver.driver_remote_connection import DriverRemoteConnection
+
+g = traversal().with_remote(DriverRemoteConnection('ws://localhost:8182/gremlin'))
+
+# Create a Transaction.
+tx = g.tx()
+
+# Spawn a new GraphTraversalSource, binding all traversals established from it to tx.
+gtx = tx.begin()
+
+try:
+    # Execute a traversal within the transaction.
+    gtx.add_v("person").property("name", "Lyndon").iterate(),
+
+    # Commit the transaction. The transaction can no longer be used and cannot be re-used.
+    # A new transaction can be spawned through g.tx().
+    # The context of g remains sessionless throughout the process.
+    tx.commit()
+except Exception as e:
+    # Rollback the transaction if an error occurs.
+    tx.rollback()
+```
+## python submitting thru client class
+```python
+from gremlin_python.driver import client 
+client = client.Client('ws://localhost:8182/gremlin', 'g') 
+# Cluster cluster = Cluster.open();
+# Client client = cluster.connect(); // sessionless
+# // 3 vertex additions in one request/transaction:
+# client.submit("g.addV();g.addV();g.addV()").all().get();
+
+result_set = client.submit('[1,2,3,4]')  
+future_results = result_set.all()  
+results = future_results.result() 
+assert results == [1, 2, 3, 4] 
+
+future_result_set = client.submit_async('[1,2,3,4]') 
+result_set = future_result_set.result() 
+result = result_set.one() 
+assert results == [1, 2, 3, 4] 
+assert result_set.done.done() 
+
+client.close() 
 ```
 
 
