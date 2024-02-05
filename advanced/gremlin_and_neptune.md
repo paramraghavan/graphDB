@@ -38,7 +38,7 @@ try {
     }
 }
 ```
-## Using python and ßgremlin_python library
+## Using python and gremlin_python library
 >> ref: https://tinkerpop.apache.org/docs/current/reference/#gremlin-python-transactions
 ```python
 from gremlin_python.process.anonymous_traversal import traversal
@@ -48,17 +48,17 @@ from gremlin_python.driver.driver_remote_connection import DriverRemoteConnectio
 g = traversal().withRemote(DriverRemoteConnection('ws://localhost:8182/gremlin', 'g'))
 # 2 vertex additions in three individual requests/transactions:
 try:
-    g.V().addV('person').property('name', 'John').iterate()
+    g.addV('person').property('name', 'John').iterate()
 except Exception as e:
     print(f"An error occurred: {e}")   
 try:    
-    g.V().addV('person').property('name', 'Bob').iterate()
+    g.addV('person').property('name', 'Bob').iterate()
 except Exception as e:
     print(f"An error occurred: {e}") 
 
 try:
     # 3 vertex additions in one single request/transaction::
-    g.V().addV('person').property('name', 'John').\
+    g.addV('person').property('name', 'John').\
     addV('person').property('name', 'Bob').\
     addV('person').property('name', 'Bill').iterate()
         
@@ -66,7 +66,10 @@ except Exception as e:
     print(f"An error occurred: {e}")
 ```
 
+#### tx(), tx,rollback, commit are all not implemented in gremlin python
 ```python
+# This does not work fails @ g.tx(), tx,rollback, commit are all not implemented in
+# gremlin python.
 from gremlin_python.process.anonymous_traversal import traversal
 from gremlin_python.driver.driver_remote_connection import DriverRemoteConnection
 
@@ -90,27 +93,33 @@ except Exception as e:
     # Rollback the transaction if an error occurs.
     tx.rollback()
 ```
-## python submitting thru client class
+## python submit using client handler
 ```python
 from gremlin_python.driver import client 
-client = client.Client('ws://localhost:8182/gremlin', 'g') 
-# Cluster cluster = Cluster.open();
-# Client client = cluster.connect(); // sessionless
-# // 3 vertex additions in one request/transaction:
-# client.submit("g.addV();g.addV();g.addV()").all().get();
+client_handler = None
+client_handler = client.Client('ws://localhost:8182/gremlin', 'g') 
 
-result_set = client.submit('[1,2,3,4]')  
-future_results = result_set.all()  
-results = future_results.result() 
-assert results == [1, 2, 3, 4] 
+# result_set = client_handler.submit('[1,2,3,4]')  
+# future_results = result_set.all()  
+# results = future_results.result() 
+# assert results == [1, 2, 3, 4] 
+# 
+# future_result_set = client_handler.submit_async('[1,2,3,4]') 
+# result_set = future_result_set.result() 
+# result = result_set.one() 
+# assert results == [1, 2, 3, 4] 
+# assert result_set.done.done() 
 
-future_result_set = client.submit_async('[1,2,3,4]') 
-result_set = future_result_set.result() 
-result = result_set.one() 
-assert results == [1, 2, 3, 4] 
-assert result_set.done.done() 
+try:
+    insert_query = "g.addV('person').property('name', 'John').addV('person').property('name', 'Bob').addV('person').property('name', 'Bill').iterate()"    
+    client_handler.submit(insert_query).all()      
+except Exception as e:
+    print(e)  
+finally:
+    if client_handler != None:
+        client_handler.close()
 
-client.close() 
+client_handler.close() 
 ```
 
 
@@ -132,9 +141,9 @@ provide them when you add vertices or edges.
 User-supplied IDs are allowed in Neptune Gremlin with the following stipulations.
 * Supplied IDs are optional.
 * Only vertexes and edges are supported.
-* Only type String is supported.
+* Only type String is supported.
 
-To create a new vertex with a custom ID, use the property step with the id keyword: g.addV().property(id, 'customid').
+To create a new vertex with a custom ID, use the property step with the id keyword: g.addV().property(id, 'customid').
 > **Note:** Do not put quotation marks around the id keyword. It refers to T.id.
 
 All vertex IDs must be unique, and all edge IDs must be unique. However, _Neptune does allow a vertex and an edge to have
