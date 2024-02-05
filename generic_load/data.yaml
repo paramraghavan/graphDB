@@ -1,16 +1,16 @@
 vertices:
   - id: 1
-    label: 'person'
+    label: 'person::female'
     properties:
       name: 'Alica'
       age: 30
   - id: 2
-    label: 'person'
+    label: 'person::male'
     properties:
       name: 'Michael'
       age: 35
   - id: 3
-    label: 'person'
+    label: 'person::male'
     properties:
       name: 'Ram'
       age: 33
@@ -18,11 +18,11 @@ vertices:
 edges:
   - from: 1
     to: 2
-    label: 'knows'
+    label: 'knows::friend1'
     properties:
       since: '2020'
   - from: 2
     to: 3
-    label: 'colleagues'
+    label: 'colleagues::friend'
     properties:
       since: '2016'

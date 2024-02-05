@@ -8,10 +8,41 @@ access patterns, such as:
 * Traversing relationships (edges) from a given vertex.
 * Querying vertices or edges based on property values.
 
+## Indexing in Amazon Neptune
+
+Amazon Neptune automatically indexes the properties of vertices and edges to improve the performance of queries. Here's
+how indexing works in Neptune:
+- **Primary Indexes**
+  Neptune automatically indexes the IDs of vertices and edges, making operations that retrieve or manipulate specific
+  vertices or edges by their ID very efficient.
+- **Label Indexes**
+  Neptune indexes the labels of both vertices and edges. This allows for efficient retrieval of vertices or edges of a
+  particular type or category, which is essential for performing graph traversals and searches based on types of
+  entities and relationships.
+- **Property Indexes**
+  Neptune automatically indexes the properties of vertices and edges. This indexing supports efficient queries that
+  filter vertices or edges based on their properties. For example, finding all vertices with a **name** property equal to **"
+  Alice"** is optimized through property indexes.
+  - **Selective Property Values**
+    - For highly selective queries (where the property value is unique or rare), Neptune's
+      automatic indexes can significantly speed up query execution.
+    - Knowing the distribution of your data helps in identifying which properties and values are most selective.
+    - Use **Appropriate Predicates**: Gremlin offers a variety of predicates (e.g., eq, gt, lt, within, etc.) that can
+      be used to craft precise and efficient filters.
+- **Composite Indexes**
+  Neptune does not explicitly allow for the manual creation of composite indexes meaning indexes on multiple properties or
+  combinations of properties and labels. However, its query optimizer can effectively utilize its existing indexes to
+  optimize queries that involve multiple property filters or a mix of property and label conditions.
+- **Understand Index Limitations**
+  While Neptune's automatic indexing is powerful, understanding its limitations is important. For example, _complex
+  queries that involve multiple hops or less selective properties might not benefit as much from indexing_.
+
+
+
 >While **you can't use the explain()** step in Neptune to analyze query execution plans, understanding how Neptune 
 > automatically manages indexes can help you write efficient queries. 
 
-**Neptune's Indexing Mechanism**
+### Neptune's Indexing Mechanism in Detail
 - **Graph Data Model**: Neptune uses a quad-based graph data model, with each quad consisting of **subject (S), predicate (P), object (O), 
 and graph (G) positions**. This model is foundational for how data is indexed and queried.
 - **Automatic Index Creation:** Neptune automatically creates and maintains certain indexes based on this quad model. 
@@ -23,7 +54,7 @@ By default, it maintains three indexes - **SPOG, POGS, and GPSO**. These indexes
 - **Index Usage:** When you run a query in Neptune, the system utilizes these indexes to efficiently locate the data. 
 The choice of index depends on the query's structure and the known positions within that query.
 
-**Quad  attributes used  in Amazon Neptune**
+### Quad  attributes used  in Amazon Neptune
 
 A "quad" consists of four components: subject, predicate, object, and graph. Let's breakdown
 each of these components in the context of a graph involving airports and flight routes:
@@ -51,7 +82,7 @@ Here is a quad: (JFK Airport, hasRouteTo, LAX Airport, International Flights). T
   - Gremlin Query: g.V('vertexId').properties()
   - Neptune Index Used: SPOG index, as the subject (vertex ID) is known.
 
-## Predicates wrt Amazon Neptune and graph databases
+### Predicates wrt Amazon Neptune and graph databases
 Predicates are often the labels on the edges that define the type of relationship between two vertices. For example consider a social network graph,
 Vertices are People and Edges are Relationships between people.
 
@@ -64,7 +95,7 @@ In Gremlin, you might query these relationships as follows:
 - To find who knows Person A: g.V('PersonA').in('knows')
 - To find who Person A follows: g.V('PersonA').out('follows')
 
-## Example Use Cases for quad indexes
+### Example Use Cases for quad indexes
 * Finding Vertex Labels: 
   * For a query like g.V('v1').label(), Neptune uses the SPOG index. The pattern here is (<v1>, <~label>, ?, ?), where the known positions are subject and predicate.
   * For Query: g.V('vertexId').properties(), Neptune Index Used: SPOG index, as the subject (vertex ID) is known.
@@ -93,12 +124,3 @@ Neptune Index Used: SPOG index, as it starts with a known vertex and looks for o
   * Neptune does not have a reverse traversal OSGP index, which would be ideal for this query. 
 If your graph has many distinct predicates, enabling the OSGP index using Lab Mode may improve performance.
 
-
-## Explain Index Pattern (?, ?, ?, <e1>) 
-This pattern is a representation of how Neptune uses its GPSO index to process the query. Each question mark or the 
-value in the pattern corresponds to a part of the quad-based data model used by Neptune: Graph (G), Predicate (P), Subject (S), and Object (O).
-
-- Graph (G): Represented by the first question mark (?). In this specific query, the graph context is not specified, hence the question mark indicating an unspecified or wildcard value.
-- Predicate (P): Represented by the second question mark (?). Similarly, the predicate is not specified in the query, as we are not filtering by the type of relationship (predicate) but rather by a specific edge.
-- Subject (S): Represented by the third question mark (?). The subject is also unspecified because the query is looking for both vertices connected by the edge, regardless of which is the subject or object in the relationship.
-- Object (O): Represented by <e1>. This is the only specified part of the pattern, indicating that we are looking for information specifically related to the edge 'e1'.

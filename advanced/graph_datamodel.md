@@ -105,3 +105,4 @@ track of the paths being traversed. This can increase the memory usage and compu
 or when many paths are being evaluated.
 
 >> Referenced from https://kelvinlawrence.net/book/PracticalGremlin.pdf
+> https://docs.aws.amazon.com/neptune/latest/userguide/feature-overview-data-model.html
