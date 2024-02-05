@@ -31,6 +31,8 @@ select country,count(country) from airports group by country;
 We can do this in Gremlin using the air-routes graph
 ```gremlin
 g.V().hasLabel('airport').groupCount().by('country')
+#OR
+g.V().hasLabel('airport').group().by('country').by(count())
 ```
 
 - Air routes table
