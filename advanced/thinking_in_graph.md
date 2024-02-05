@@ -20,7 +20,7 @@ Here are some analogies to translate SQL concepts to Gremlin:
 **SQL Table**
 - Airport table by country
 
-![img.png](../img.png)
+![Airport Table](./img.png)
 
 ## Select
 SQL query to count the distribution of airports in each country as follows.
@@ -237,7 +237,7 @@ and an edge are considered **incident** if they are connected to each other.
 
 
 ### out() vs. outE()
-![img_1.png](../img_1.png)
+![User Item Purchase Graph](./img_1.png)
 
 In the graph above, we have four vertices and three edges. The vertex in the middle with the property "name": "sunny" is
 the vertex from where we'll start our traversal. The other three vertices are the items that I bought from an e-commerce
