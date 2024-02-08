@@ -12,7 +12,7 @@ create visual representations of the graph.
 
 ```gremlin
 // Start the traversal from a specific vertex or with a specific condition
-g.V().has('property', 'value')
+g.V().has('property name', 'its value')
   .outE()  // Traverse outgoing edges
   .inV()   // Traverse to neighboring vertices
   .project('source', 'target', 'edgeProperty')  // Extract relevant data for visualization
@@ -35,6 +35,15 @@ vertices and edges.
 > graphs or with a high depth limit, so it's important to use such queries cautiously in production environments.
 
 ```gremlin
+// g.V().group().by(label).by(count())
+// g.V().repeat(out()).times(3).path()
+// g.V().repeat(out()).times(3).path().by(elementMap())
+// g.V().hasLabel('airport').repeat(outE().inV()).times(2).path().by(elementMap())
+// g.V().outE().inV().path().by(elementMap())
+// g.V().repeat(out()).times(3)
+// g.V().outE().inV().path().by(valueMap())
+// g.V().repeat(outE().inV()).times(2).path().by(valueMap())
+// g.V().repeat(outE().inV()).times(2).path().by(valueMap()).toList()
 g.V() // Start from all vertices in the graph
   .repeat(bothE().otherV().simplePath()) // Traverse both in and out edges, ensuring simple paths
     .times(depthLimit) // Repeat traversal up to the depth limit
