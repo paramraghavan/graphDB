@@ -8,30 +8,76 @@ from gremlin_python.process.strategies import *
 from gremlin_python.driver.driver_remote_connection import DriverRemoteConnection
 from gremlin_python.process.anonymous_traversal import traversal
 from gremlin_python.process.traversal import T, Direction
+from gremlin_python.driver import client, serializer
 
 app = Flask(__name__)
 # Define the Neptune server connection configuration
 neptune_host = "localhost"
 neptune_port = 8182
 
+graph = Graph()
+remoteConn = DriverRemoteConnection(f'ws://{neptune_host}:{neptune_port}/gremlin', 'g')
+g = traversal().withRemote(remoteConn)
+
+
 @app.route('/')
 def index():
     return render_template('index.html')
 import json
 
+#  https://aiogremlin.readthedocs.io/en/latest/index.html
 @app.route('/query', methods=['POST'])
 def query_graph():
     query = request.form["query"]
-    graph = Graph()
-    remoteConn = DriverRemoteConnection(f'ws://{neptune_host}:{neptune_port}/gremlin', 'g')
-    g = traversal().withRemote(remoteConn)
-    user_query = 'g.V().repeat(bothE().otherV()).times(2).path().by(__.elementMap())'
-    # results = eval(user_query)
-    results = g.V().repeat(bothE().otherV()).times(2).path().by(__.elementMap()).toList()  # Replace with actual query logic
-    # Convert paths to a JSON serializable list
-    json_paths = [path_to_dict(path) for path in results]
 
-    return json_paths
+    #user_query = 'g.V().repeat(bothE().otherV()).times(2).path().by(elementMap())' #'g.V().repeat(bothE().otherV()).times(2).path().by(__.elementMap())'
+    # g.V().repeat(out()).times(3).path().by(elementMap())
+    # results = eval(user_query)
+    # user_query = "g.V().outE().inV().project('source', 'target', 'edgeProperty').by(id()).by(out()).by('property').path()"
+    #user_query = 'g.V().repeat(bothE().otherV()).times(2).path().by(elementMap()).toList()'
+    user_query = 'g.with_("evaluationTimeout", 90000).V().repeat(__.outE().inV()).times(3).path().by(__.elementMap()).toList()'
+    # Assuming g is your traversal source as defined earlier
+    # This example just shows how to set options, replace the actual traversal according to your needs
+
+    results = eval(user_query)
+    # Replace with actual query logic
+    # Convert paths to a JSON serializable list
+    #json_paths = [path_to_dict(path) for path in results]
+    nodes, edges = parse_path(results)
+
+    nodes_edges = {}
+    nodes_edges['nodes'] = nodes
+    nodes_edges['edges'] = edges
+    json_result = json.dumps(nodes_edges)
+    return json_result
+
+
+def parse_path(paths) ->([],[]):
+    nodes = []
+    edges = []
+    for path in paths:
+        for element in path:
+           # {str(k) if isinstance(k, (T,Direction)) else k: element_to_dict(v) for k, v in element.items()}
+            elm = {}
+            for k, v in element.items():
+                if isinstance(k, (T)):
+                    if 'id' in str(k):
+                        elm['id'] = v
+                    if 'label' in str(k):
+                        elm['label'] = v
+                elif isinstance(k, Direction):
+                    if 'IN' in str(k):
+                        elm['target'] = next(iter(v.values())) # or use list(v.values())[0]
+                    if 'OUT' in str(k):
+                        elm['source'] = next(iter(v.values()))
+                else:
+                    elm[k] = v
+            if 'vertex' in elm['label']:
+                nodes.append(elm)
+            else:
+                edges.append(elm)
+    return (nodes, edges)
+
 
 def path_to_dict(path):
     return [element_to_dict(element) for element in path]
