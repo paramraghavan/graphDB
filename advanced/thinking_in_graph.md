@@ -1100,6 +1100,18 @@ entire result which is treated as a single entity at that point._
 ```
 
 
+## Add gremlin query timeout, evaluationTimeout
+- g.with_("evaluationTimeout", time_out_in_millisec)
+```python
+# timeout 90000 millisec
+user_query = 'g.with_("evaluationTimeout", 90000).V().repeat(__.out()).times(3).path().by(__.elementMap()).toList()'
+results = eval(user_query)
+```
+
+```gremlin
+g.with_('evaluationTimeout', 90000).V().repeat(out()).times(3).path().by(elementMap()).toList()
+```
+
 
 >> References:
 > https://kelvinlawrence.net/book/PracticalGremlin.pdf
