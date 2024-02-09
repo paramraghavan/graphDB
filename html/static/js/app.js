@@ -15,6 +15,13 @@ document.getElementById('queryForm').addEventListener('submit', function(e) {
 });
 
 function load(nodes, links) {
+        // Select the SVG element
+        var svgElement = document.querySelector("svg");
+
+        // Remove all child nodes
+        while (svgElement.firstChild) {
+            svgElement.removeChild(svgElement.firstChild);
+        }
         const svg = d3.select("svg"),
             width = +svg.attr("width"),
             height = +svg.attr("height");
@@ -42,7 +49,7 @@ function load(nodes, links) {
                 tooltip.transition()
                     .duration(200)
                     .style("opacity", .9);
-                tooltip.html(d.miles)
+                tooltip.html(event.miles)
                     .style("left", (event.pageX) + "px")
                     .style("top", (event.pageY - 28) + "px");
             })
@@ -69,7 +76,7 @@ function load(nodes, links) {
                 tooltip.transition()
                     .duration(200)
                     .style("opacity", .9);
-                tooltip.html(d.code + "<br/>" +  d.color)
+                tooltip.html(event.code + "<br/>" +  event.color)
                     .style("left", (event.pageX) + "px")
                     .style("top", (event.pageY - 28) + "px");
             })
@@ -79,13 +86,13 @@ function load(nodes, links) {
                     .style("opacity", 0);
             });
 
-        var labels = svg.append("g")
+        const labels = svg.append("g")
           .attr("class", "labels")
           .selectAll("text")
           .data(nodes)
           .enter().append("text")
             .text(d => d.code)
-            .attr("x", 8)
+            .attr("x", 14)
             .attr("y", "0.31em");
 
         // Update positions each tick
@@ -100,7 +107,7 @@ function load(nodes, links) {
                 .attr("cx", d => d.x)
                 .attr("cy", d => d.y);
             labels
-                .attr("x", d => d.x + 10)
+                .attr("x", d => d.x + 15)
                 .attr("y", d => d.y);
         });
         // Assuming you have the force simulation set up as in the previous example
@@ -120,7 +127,7 @@ function load(nodes, links) {
 <!--            .style("stroke-width", newThickness); // Set new thickness-->
 
         // Drag functions
-        function dragstarted(event) {
+        function dragstarted1(event) {
             if (!event.active) simulation.alphaTarget(0.3).restart();
             if (event.subject && event.subject.x)
                 event.subject.fx = event.subject.x;
@@ -128,12 +135,14 @@ function load(nodes, links) {
             event.subject.fy = event.subject.y;
         }
 
-        function dragged(event) {
-            event.subject.fx = event.x;
-            event.subject.fy = event.y;
+        function dragged1(event) {
+            if (event && event.x)
+                event.subject.fx = event.x;
+            if (event && event.y)
+                event.subject.fy = event.y;
         }
 
-        function dragended(event) {
+        function dragended1(event) {
             if (!event.active) simulation.alphaTarget(0);
             if (event.subject && event.subject.fx)
             event.subject.fx = null;
@@ -141,6 +150,17 @@ function load(nodes, links) {
             event.subject.fy = null;
         }
 
+        function dragstarted(event, d) {
+          d3.select(this).raise().attr('stroke', 'black');
+        }
+
+        function dragged(event, d) {
+          d3.select(this).attr("cx", d.x = event.x).attr("cy", d.y = event.y);
+        }
+
+        function dragended(event, d) {
+          d3.select(this).attr('stroke', null);
+        }
 }
 
 

@@ -57,6 +57,7 @@ def parse_path(paths) ->([],[]):
     color_prop = 'code'
     nodes = []
     edges = []
+    id_list = []
     for path in paths:
         for element in path:
            # {str(k) if isinstance(k, (T,Direction)) else k: element_to_dict(v) for k, v in element.items()}
@@ -75,13 +76,14 @@ def parse_path(paths) ->([],[]):
                 else:
                     elm[k] = v
             if 'vertex' in elm['label']:
-
-                if color_prop in elm.keys():
-                   color =  string_to_color_code(elm[color_prop])
-                else:
-                    color = '#000000'
-                elm['color']  = color
-                nodes.append(elm)
+                if elm['id'] not in id_list:
+                    id_list.append(elm['id'])
+                    if color_prop in elm.keys():
+                       color =  string_to_color_code(elm[color_prop])
+                    else:
+                        color = '#000000'
+                    elm['color']  = color
+                    nodes.append(elm)
             else:
                 elm['width'] = 2
                 edges.append(elm)
