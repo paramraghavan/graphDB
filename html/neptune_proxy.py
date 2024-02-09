@@ -35,7 +35,7 @@ def query_graph():
     # results = eval(user_query)
     # user_query = "g.V().outE().inV().project('source', 'target', 'edgeProperty').by(id()).by(out()).by('property').path()"
     #user_query = 'g.V().repeat(bothE().otherV()).times(2).path().by(elementMap()).toList()'
-    user_query = 'g.with_("evaluationTimeout", 90000).V().repeat(__.outE().inV()).times(3).path().by(__.elementMap()).toList()'
+    user_query = 'g.with_("evaluationTimeout", 90000).V().repeat(__.outE().inV()).times(1).limit(3).dedup().path().by(__.elementMap()).toList()'
     # Assuming g is your traversal source as defined earlier
     # This example just shows how to set options, replace the actual traversal according to your needs
 
@@ -53,6 +53,8 @@ def query_graph():
 
 
 def parse_path(paths) ->([],[]):
+    # color node based on 'code'
+    color_prop = 'code'
     nodes = []
     edges = []
     for path in paths:
@@ -73,8 +75,15 @@ def parse_path(paths) ->([],[]):
                 else:
                     elm[k] = v
             if 'vertex' in elm['label']:
+
+                if color_prop in elm.keys():
+                   color =  string_to_color_code(elm[color_prop])
+                else:
+                    color = '#000000'
+                elm['color']  = color
                 nodes.append(elm)
             else:
+                elm['width'] = 2
                 edges.append(elm)
     return (nodes, edges)
 
@@ -96,6 +105,31 @@ def element_to_dict(element):
                 "properties": element_to_dict(element.properties)}
     else:
         return element
+
+
+import hashlib
+
+
+def string_to_color_code(s):
+    # Use a hash function (e.g., MD5) to get a consistent hash value
+    hash_object = hashlib.md5(s.encode())
+    # Take the first 6 characters from the hash's hexadecimal representation
+    hex_digest = hash_object.hexdigest()[:6]
+
+    # Convert the hex digest into an integer
+    color_int = int(hex_digest, 16)
+
+    # Ensure the color is in the range from #800000 to #FFFFFF
+    # Adjust the range to start from 0x800000
+    min_color = 0x800000
+    max_color = 0xFFFFFF
+    adjusted_color_int = min_color + (color_int % (max_color - min_color + 1))
+
+    # Convert back to hex, removing the '0x' prefix and ensuring it's 6 characters long
+    adjusted_color_hex = f'#{adjusted_color_int:06X}'
+
+    return adjusted_color_hex
+
 
 
 if __name__ == '__main__':
