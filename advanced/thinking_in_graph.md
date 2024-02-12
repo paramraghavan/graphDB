@@ -1112,6 +1112,61 @@ results = eval(user_query)
 g.with_('evaluationTimeout', 90000).V().repeat(out()).times(3).path().by(elementMap()).toList()
 ```
 
+## emit 
+
+The emit() step in Gremlin is used within a traversal to determine which elements are emitted (i.e., returned) as part
+of the result set. It is often used in conjunction with looping steps like repeat(), allowing for more control over
+which elements are included in the output during the traversal process. emit() can be used in various ways, depending on
+your specific needs and the structure of your graph. Here are some common use cases and examples:
+
+```gremlin
+# Without any arguments, emit() will emit all elements that are encountered:
+g.V().repeat(out()).emit()
+```
+### Emit Based on a Condition
+This query traverses outwards from all vertices, but only emits vertices that have the label 'Person'.
+```gremlin
+g.V().repeat(out()).emit(hasLabel('Person'))
+```
+- query emits vertices with the name 'John' encountered during an outward traversal from all vertices.
+```groovy
+g.V().repeat(out()).emit(has('name', 'John'))
+```
+
+- emit with condition and  until with condition
+  Let's say we want to start at an airport with the code 'LAX' and traverse through connected airports (via edges that
+  could represent flights). We aim to emit airports that are international airports (indicated by a property
+  isInternational set to true) and continue this traversal until we reach 'JFK':
+
+```gremlin
+g.V().has('airport', 'code', 'LAX') // Start at LAX
+  .repeat(out()) // Repeat traversing outwards through connected airports
+  .emit(has('isInternational', true)) // Emit only international airports
+  .until(has('code', 'JFK')) // Continue until JFK is reached
+  .path() // Collect the path traversed
+  .by('code') // Represent each step in the path by the airport code
+```
+* has('airport', 'code', 'LAX'): Finds the vertex representing LAX airport.
+* repeat(out()): Specifies that the traversal should follow outgoing edges to connected airports. This step is repeated 
+for each subsequent airport.
+* emit(has('isInternational', true)): Emits vertices (airports) that are marked as international 
+(isInternational property is true). This happens at each step of the repeat(), so intermediate international airports 
+are included in the output.
+* until(has('code', 'JFK')): Specifies that the traversal should continue until an airport with the code 'JFK' is 
+reached. This is the stopping condition for the repeat() step.
+* path().by('code'): Constructs the path of the traversal, where each vertex in the path is represented by its code 
+property (the airport code).
+
+### Emit at the Start of the Traversal
+Placing emit() before repeat() will include the starting point in the result set, in addition to the elements 
+encountered during the traversal. This is useful when you want to include the root vertex (or vertices) along with 
+the vertices found during the traversal.
+```gremlin
+g.V().emit().repeat(out())
+```
+
+The order of emit() and until() matters. Placing emit() before repeat() ensures the starting point is included in 
+the results. Placing it after repeat() but before until() ensures all intermediate and final elements are emitted.
 
 >> References:
 > https://kelvinlawrence.net/book/PracticalGremlin.pdf
