@@ -68,6 +68,7 @@ python -m graph_notebook.start_notebook --notebooks-dir ~/notebook/destination/d
 
 # connect to local server
 ```graph_notebook
+#for default tinkerpop server
 %%graph_notebook_config
 {
   "host": "localhost",
@@ -79,6 +80,17 @@ python -m graph_notebook.start_notebook --notebooks-dir ~/notebook/destination/d
     "password": "",
     "message_serializer": "graphsonv3"
   }
+}
+
+## for neptune
+%%graph_notebook_config
+{
+"host": "neptunedbinstance-xyz.neptune.amazonaws.com",
+"neptune_service": "neptune-db",
+"load_from_s3_arn": ""
+"ssl": true,
+"ssl_verify": true,
+"aws _region": *us-east-1"
 }
 
 # execute gremlin
