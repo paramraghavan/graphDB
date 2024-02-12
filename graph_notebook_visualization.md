@@ -44,6 +44,7 @@ vertices and edges.
 // g.V().outE().inV().path().by(valueMap())
 // g.V().repeat(outE().inV()).times(2).path().by(valueMap())
 // g.V().repeat(outE().inV()).times(2).path().by(valueMap()).toList()
+// g.V().repeat(bothE().otherV()).times(2).path().by(__.elementMap()).toList()
 g.V() // Start from all vertices in the graph
   .repeat(bothE().otherV().simplePath()) // Traverse both in and out edges, ensuring simple paths
     .times(depthLimit) // Repeat traversal up to the depth limit
@@ -80,3 +81,24 @@ g.V().outE().inV().path().by(valueMap('code', 'name')).order(local).by(keys)
 g.V().outE().inV().path().by(valueMap('miles','code', 'name')).order(local).by(keys)
 
 ```
+
+## Gremlin query returning a tree structure of vertices and edges
+Following example assumes you are working with a graph that has vertices connected by edges, you want to build a tree starting from a specific vertex
+```gremlin
+g.V().has('airport::vertex', 'code', 'LAX').repeat(out()).times(2).emit().tree().by('code')
+g.V().has('airport::vertex', 'code', 'LAX').repeat(out()).times(2).emit().tree().path().by(elementMap())
+g.V(startVertexId) // Start from a specific vertex
+  .repeat(out()simplePath())    // Recursively traverse outgoing edges, Use simplePath to avoid cycles
+  .emit()           // Emit all vertices encountered during the traversal
+  .tree()           // Construct a tree structure from the traversal
+  .by('name')       // Optionally, label the tree nodes using the 'name' property of each vertex
+g.V().hasLabel('airport::vertex').outE().inV().tree().by('name')
+```
+* g.V(startVertexId): This initiates the traversal starting from a vertex with the given ID.
+* repeat(out()): This step repeats the traversal for outgoing edges from each vertex. It's the mechanism by which you
+  traverse the graph.
+* emit(): This step ensures that all vertices encountered during the traversal are included in the result.
+* tree(): This collects the traversal into a tree structure. The vertices are organized according to their paths in the
+  traversal, effectively creating a tree representation of the graph from the starting vertex.
+* by('name'): This is a modulator for the tree step, specifying that the vertices in the tree should be labeled by their
+  name property. You can adjust this to use any property relevant to your graph.
