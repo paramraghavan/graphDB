@@ -1168,6 +1168,17 @@ g.V().emit().repeat(out())
 The order of emit() and until() matters. Placing emit() before repeat() ensures the starting point is included in 
 the results. Placing it after repeat() but before until() ensures all intermediate and final elements are emitted.
 
+
+## Filter/Count By Multiple labels - AND/OR
+To count vertices that use multiple labels, you can use the following strategies:
+- g. V () . hasLabel (<list of labels to evalulate>). count () will count all vertices that have any of the l provided
+  in the list. For example g. V () • has Label ('airport', 'vertex') will count any vertex that has a **label airport or
+  vertex**. Each vertex only gets counted once, no matter how many labels it may have in this scenario.
+- g. V () - has Label (<first label >). hasLabel (<second label) . count () is an **AND operation**. This will  count
+  vertices that have both the first label and the second label. So if you executed
+- g. V () - hasLabel ('airport'). hasLabel ('vertex') . count () it would only count the vertices that have bot those labels.
+- Edges can only have one label. If you need to represent a multi-labeled relationship, then it is suggested to use multiple edges in this case.
+
 >> References:
 > https://kelvinlawrence.net/book/PracticalGremlin.pdf
 > https://blog.contactsunny.com/data-science/out-vs-oute-janusgraph-and-gremlin
