@@ -216,7 +216,7 @@ This query does the following:
   * Optimization strategies used (e.g., filter optimization, index usage).
   * The order in which steps are executed, which might differ from the order in which they are written due to optimizations.
 
-## Neptune mulitple label support
+## Neptune multiple label support
 Neptune supports multiple labels for a vertex. When you create a label, you can specify multiple labels by separating them with ::. 
 For example, g.addV("Label1::Label2::Label3") adds a vertex with three different labels. The hasLabel step matches this vertex 
 with any of those three labels: hasLabel("Label1"), hasLabel("Label2"), and hasLabel("Label3").

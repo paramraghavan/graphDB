@@ -187,3 +187,14 @@ When modeling your data in a graph database, choosing the right cardinality for 
   code or a person's social security number.
 - List or set cardinality is more appropriate for properties that can naturally have multiple values, like a person's
   list of email addresses or an airport's list of alias names.
+
+## neptune python utilities - bulkload
+- https://github.com/awslabs/amazon-neptune-tools/tree/master/neptune-python-utils
+
+
+## gremlin neptune transaction
+- https://docs.aws.amazon.com/neptune/latest/userguide/access-graph-gremlin-transactions.html
+
+## Truncate nodes and edges
+- https://aws.amazon.com/blogs/database/resetting-your-graph-data-in-amazon-neptune-in-seconds/
+- https://docs.aws.amazon.com/neptune/latest/userguide/manage-console-fast-reset.html
