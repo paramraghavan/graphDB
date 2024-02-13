@@ -24,14 +24,16 @@ these queries. Use clear, descriptive names for labels that accurately represent
 _Query Optimization:_ Labels can significantly improve query performance by allowing you to narrow down searches to 
 specific types of nodes or relationships. Use labels to filter queries, ensuring that they are as efficient as possible.
 For example, you tag the Source node with Labels - S3, Snowflake, rDBMS, etc., you are only interested in S3 nodes,
-you can directly query for those nodes without scanning through other unrelated Source tye nodes
+you can directly query for those nodes without scanning through other unrelated Source type nodes
 
 _Logical Structure/Schema Design:_ Graph databases are schema-less or have flexible schemas, using labels allows 
 you to impose a logical structure on your data. 
 
 _Multiple labels to Node and Edges:_
 Amazon Neptune does not support assigning multiple labels directly to relationships (edges) within its graph database.
-In Neptune, each edge is defined with a single label (or edge type) that specifies the nature. 
+In Neptune, each edge is defined with a single label (or edge type) that specifies the nature. If you need to represent
+a multi-labelled relationship, then it is suggested to use multiple edges in this case.
+
 **Composite Labels**  
 Create a composite label that combines multiple concepts into one. For example, if you need to label a relationship 
 as both "friend" and "colleague," you could create a composite label like "Friend_Colleague." This approach is 
@@ -46,6 +48,7 @@ relationship.
 it is possible to apply multiple labels to a single node, allowing for a more nuanced classification of entities. This
 feature can be particularly useful in complex domains where an entity might fulfill multiple roles or belong to multiple
 categories. for example source could be S3, Snowflake,RDBMS,etc..
+
 **Neptune supports multiple labels for a vertex.** When you create a label, you can specify multiple labels by separating
 them with ::. For example, g.addV("Label1::Label2::Label3") adds a vertex with three different labels. The hasLabel step
 matches this vertex with any of those three labels: hasLabel("Label1"), hasLabel("Label2"), and hasLabel("Label3").
