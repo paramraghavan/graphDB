@@ -198,3 +198,19 @@ When modeling your data in a graph database, choosing the right cardinality for 
 ## Truncate nodes and edges
 - https://aws.amazon.com/blogs/database/resetting-your-graph-data-in-amazon-neptune-in-seconds/
 - https://docs.aws.amazon.com/neptune/latest/userguide/manage-console-fast-reset.html
+
+## Multiple Graph Application In the Same  Cluster
+A single Neptune cluster equates to a single graph. Neptune is "schema-less" and does not provide any APIs similar to
+DDL operations in a traditional relational database. Customers that want to store more than one graph in a single
+Neptune cluster have used different labeling strategies to denote which vertices/edges/properties belong to a given
+graph. A common approach is to use a unique prefix for each label. For example, if you had a Airport label for a given
+vertex, you may use prefixes like Graph1-Airport or Graph2-Airport on to distinguish which graph you are attempting to access.
+Then in your application logic, you would append these prefixes within your queries to ensure you are accessing the
+correct graph for a given user/application.
+
+## Schema Constraints
+Neptune is a schema-less datastore. There are a couple of built-in constraints that you can use to your advantage:
+- Each ID of a vertex and edge must be unique. If you have some concept of a unique identifier in your dataset, 
+use this as an ID for a related vertex or edge in your graph data model.
+- Every edge must have vertices on both sides of the edge. "Dangling edges" cannot exist in Neptune.
+
