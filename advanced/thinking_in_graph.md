@@ -949,6 +949,39 @@ wrapping the second half of the query inside of a local step as shown below.
 [WRY,Westray]
 ```
 
+## Using aggregate step to create a temporary collection
+As per this graph, there were 59 places you could fly to directly (non stop) from
+Austin. We can verify this fact using the following query.
+```gremlin
+  g.V().has('code','AUS').out().count()
+  # 59
+```
+
+If we wanted to count how many places we could go to from Austin with one stop, we could use the following query. The
+dedup step is used as we only want to know how many unique places we can go to, not how many different ways of getting
+to all of those places there are.
+
+```gremlin
+  g.V().has('code','AUS').out().out().dedup().count()
+  871
+```
+
+There is however a problem with this query. The 871 places is going to include (some or possibly all of) the places we
+can also get to non stop from Austin. What we really want to find are all the places that you can only get to from
+Austin with one stop. So what we need is a way to remember all of those places and remove them from the 871 some how.
+This is where aggregate is useful. Take a look at the modified query below
+
+```gremlin
+ g.V().has('code','AUS').out().aggregate('nonstop').
+       out().where(without('nonstop')).dedup().count()
+812
+```
+
+After the first out step all of the vertices that were found are stored in a collection we chose to call **nonstop**. Then,
+after the second out we can add a where step that essentially says "only keep the vertices that are not part of the
+nonstop collection". We still do the dedup step as otherwise we will still end up counting a lot of the remaining
+airports more than once.
+
 ##  Basic statistical and numerical operations
 | step  | descrition|
 |-------|------------------------------------|
