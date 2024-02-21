@@ -1,6 +1,11 @@
 # How to load vertex and edge's into AWs Neptune
 Here the example uses airport as vertex and routes as edge
 
+## Neptune endpoints
+- http://your-neptune-endpoint:8182/loader
+- http://your-neptune-endpoint:8182/gremlin
+- http://your-neptune-endpoint:8182/status
+
 ## Step 1: Preparing the CSV Files
 - You'll need two CSV files: one for the vertices (airports) and one for the edges (routes).
 - Vertex -airports.csv. The first row should define the property keys, starting with ~id and ~label. ~id is a unique
@@ -31,6 +36,16 @@ curl -X POST \
     -H 'Content-Type: application/json' \
     http://your-neptune-endpoint:8182/loader -d '
     {
+      "source" : "s3://your-bucket-name/all_vertices_under_this_prefix",
+      "format" : "csv",
+      "iamRoleArn" : "your-iam-role-arn",
+      "region" : "your-region",
+      "failOnError" : "FALSE"
+    }
+curl -X POST \
+    -H 'Content-Type: application/json' \
+    http://your-neptune-endpoint:8182/loader -d '
+    {
       "source" : "s3://your-bucket-name/airports.csv",
       "format" : "csv",
       "iamRoleArn" : "your-iam-role-arn",
@@ -48,7 +63,7 @@ curl -X POST \
   "failOnError" : "FALSE",
   "parallelism" : "MEDIUM",
   "updateSingleCardinalityProperties" : "FALSE",
-  "files" : [ "airports.csv", "routes.csv" ]
+  "files" : [ "airports.csv"]
 }'    
 ```
 - Load Edges
@@ -63,6 +78,17 @@ curl -X POST \
       "region" : "your-region",
       "failOnError" : "FALSE"
     }'
+    
+curl -X POST \
+    -H 'Content-Type: application/json' \
+    http://your-neptune-endpoint:8182/loader -d '
+    {
+      "source" : "s3://your-bucket-name/all_edges_under_this_prefix/",
+      "format" : "csv",
+      "iamRoleArn" : "your-iam-role-arn",
+      "region" : "your-region",
+      "failOnError" : "FALSE"
+    }'    
 ```
 - Load Vertices and Edges together
 ```shell
@@ -95,7 +121,9 @@ curl -X POST https://your-neptune-endpoint:port/loader \
 
 ```
 ```python
+from botocore.awsrequest import AWSRequest
 import requests
+import json
 
 headers = {
     'Content-Type': 'application/json',
@@ -103,15 +131,21 @@ headers = {
 
 data = {
      "source" : "s3://bucket-name/object-key-name",
-     "format" : "opencypher",
-     "userProvidedEdgeIds": "TRUE",
+     "format" : "csv",
      "iamRoleArn" : "arn:aws:iam::account-id:role/role-name",
      "region" : "region",
      "failOnError" : "FALSE",
      "parallelism" : "MEDIUM",
+     "updateSingleCardinalityProperties": "FALSE",
+     "queueRequest": "TRUE",
 }
-
-response = requests.post('http://fiddle.jshell.net/echo/html/', headers=headers, data=data)
+request_url = 'http://your-neptune-endpoint:8182/loader'
+request = AWSRequest(method='POST', url=request_url, data=json.dumps(data), params = {})
+requests.headers['Content-type'] = 'application/json'
+response = requests.post(request_url, headers= requests.headers, verify=False, data=json.dumps(data))
+if response is not None:
+    resp_dict = json.dumps(response)
+    print(resp_dict)
 ```
 
 - ref https://docs.aws.amazon.com/neptune/latest/userguide/load-api-reference-load.html
