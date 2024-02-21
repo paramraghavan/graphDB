@@ -13,7 +13,7 @@ successful completion of the traversal. The transaction is rolled back when ther
 Multiple statements separated by a semicolon (;) or a newline character (\n) are included in a single transaction. Every
 statement other than the last must end with a next() step to be executed. Only the final traversal data is returned.
 
-### Gremlin Language Variants (GLV) support Gremlin's tx()
+### Gremlin Language Variants (GLV) support Gremlin's tx(), transaction scope
 
 After TinkerPop 3.5.x, the transaction can be explicitly controlled and the session managed transparently. Gremlin
 Language Variants (GLV) support Gremlin's tx() syntax to commit() or rollback() a transaction as follows:
@@ -40,6 +40,7 @@ try {
 ```
 ## Using python and gremlin_python library
 >> ref: https://tinkerpop.apache.org/docs/current/reference/#gremlin-python-transactions
+>> works with gremlinpython 3.5.2
 ```python
 from gremlin_python.process.anonymous_traversal import traversal
 from gremlin_python.driver.driver_remote_connection import DriverRemoteConnection
@@ -66,7 +67,7 @@ except Exception as e:
     print(f"An error occurred: {e}")
 ```
 
-#### tx(), tx,rollback, commit are all not implemented in gremlin python
+#### tx(), tx,rollback, commit are all not implemented in gremlin python 3.5.0
 ```python
 # This does not work fails @ g.tx(), tx,rollback, commit are all not implemented in
 # gremlin python.
@@ -93,6 +94,58 @@ except Exception as e:
     # Rollback the transaction if an error occurs.
     tx.rollback()
 ```
+
+### gremlin autocommit
+```python
+from gremlin python.process.traversal import T
+# Define the Neptune server connection configuration
+localhost_host = "localhost"
+localport_port = 8182
+from gremlin python.process.anonymous_traversal import traversal 
+from gremlin python.driver driver_remote_connection import DriverRemoteConnection
+# Connect to gremlin Server
+# neptune wss instead of ws
+remoteConn = DriverRemoteConnection(f"ws://(localhost):(localport)/gremlin','g') # localhost
+g = traversal().withRemote(remoteConn)
+# cleanup
+try:
+    g.V().hasId('Ram').drop().iterate()
+    print( 'Dropped vertex Ram')
+except Exception as e:
+    print(f"An error occurred: (e]")
+# add vertex back
+try:
+    g.addV('person').property(T.id,'Ram').property("name",'Ram').iterate()
+    print('Added vertex Ram')
+except Exception as e:
+    print(f"An error occurred: {e}")
+
+try:
+    # 3 vertex additions in one single request/transaction::
+    # this should fail and following 3 vertices shoudl not be added, as vertex with id - Ram already exist.
+    g.addv('person"). property(T.id, 'Ram") property('name', 'Ram').\
+    addV(' person').property("name','Bob999').\
+    addV("person").property("name",'Bi11999').iterate()
+except Exception as e:
+    print(f"An error occurred: {e}")
+    
+try:
+# 3 vertex additions in one single request/transaction::
+# this should fail and following 3 vertices shoudl get be added
+    g.addV('person").property( 'name', 'Anita101').\
+    addV("person").property ('name', 'Boble1').\
+    addV("person").property('name', 'Billie').iterate()
+except Exception as e:
+    print(f"An error occurred: {e}")
+try:
+    remoteConn. close()
+except Exception as e:
+    print(f'Error closing Remote connection: {e}')
+
+# g.V().hasLabel ("person').has (name", endingwith('101°).elementMap()
+```
+
+
 ## python submit using client handler
 ```python
 from gremlin_python.driver import client 
