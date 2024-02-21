@@ -217,12 +217,14 @@ This query does the following:
   * The order in which steps are executed, which might differ from the order in which they are written due to optimizations.
 
 ## Neptune multiple label support
-Neptune supports multiple labels for a vertex. When you create a label, you can specify multiple labels by separating them with ::. 
-For example, g.addV("Label1::Label2::Label3") adds a vertex with three different labels. The hasLabel step matches this vertex 
+Neptune supports multiple labels for a vertex. When you create a label, you can specify multiple labels by separating them with ;;. 
+For example, g.addV("Label1;;Label2;;Label3") adds a vertex with three different labels. The hasLabel step matches this vertex 
 with any of those three labels: hasLabel("Label1"), hasLabel("Label2"), and hasLabel("Label3").
 
->> The :: delimiter is reserved for this use only. You cannot specify multiple labels in the hasLabel step.
->> For example, hasLabel("Label1::Label2") does not match anything.
+>> The ;; delimiter is reserved for this use only. You cannot specify multiple labels in the hasLabel step.
+>> For example, hasLabel("Label1;;Label2") does not match anything.
+>> its best practice to use single label as multiple labels are not supported in all graph platform
+>> Gremlin cannot delete labels. you can delete labels using openCypher, but at least one label has to be left.
 
 ref: https://docs.aws.amazon.com/neptune/latest/userguide/access-graph-gremlin-differences.html
 
