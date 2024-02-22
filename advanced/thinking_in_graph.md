@@ -1204,13 +1204,137 @@ the results. Placing it after repeat() but before until() ensures all intermedia
 
 ## Filter/Count By Multiple labels - AND/OR
 To count vertices that use multiple labels, you can use the following strategies:
-- g. V () . hasLabel (<list of labels to evalulate>). count () will count all vertices that have any of the l provided
-  in the list. For example g. V () • has Label ('airport', 'vertex') will count any vertex that has a **label airport or
+- g.V ().hasLabel(<list of labels to evaluate>).count() will count all vertices that have any of the l provided
+  in the list. For example g.V ().hasLabel('airport', 'vertex') will count any vertex that has a **label airport or
   vertex**. Each vertex only gets counted once, no matter how many labels it may have in this scenario.
-- g. V () - has Label (<first label >). hasLabel (<second label) . count () is an **AND operation**. This will  count
+- g.V().hasLabel(<first label >).hasLabel(<second label).count() is an **AND operation**. This will  count
   vertices that have both the first label and the second label. So if you executed
-- g. V () - hasLabel ('airport'). hasLabel ('vertex') . count () it would only count the vertices that have bot those labels.
+- g.V().hasLabel('airport').hasLabel('vertex').count() it would only count the vertices that have bot those labels.
 - Edges can only have one label. If you need to represent a multi-labeled relationship, then it is suggested to use multiple edges in this case.
+
+
+## Overwriting property values and cardinality w.r.t. Neptune
+Let's update the Washington Dulles International Airport from 4 to 5
+Neptune stores all property values as sets. The Apache TinkerPop framework refers to this as set cardinality. If we were
+to try using the property('runways',5) command here, it would not overwrite the previous value. It would add the
+new 5 value as part of the set. Instead, we will want to change Neptune's default behavior. You can choose to store
+property values as **single** cardinality. **Neptune by default the Cardinality is a set and not single.**
+
+See the example below.
+
+```groovy
+g.V().has('code', 'IAD')
+# v[10]
+g.V().has('code', 'IAD').elementMap().unfold()
+
+# ==>id=10
+# ==>label=airport
+# ==>code=IAD
+# ..
+# ..
+# ==>runways=4
+# ==>desc=Washington Dulles International Airport
+
+g.V().has('code', 'IAD').property('runways', 5)
+g.V().has('code', 'IAD').elementMap().unfold()
+# ==>id=10
+# ..
+# ==>runways=[4,5]
+# ==>desc=Washington Dulles International Airport
+
+## ** single Cardinality **
+g.V().has('code', 'IAD').property(single, 'runways', 5)
+g.V().has('code', 'IAD').elementMap().unfold()
+# ==>id=10
+# ..
+# ==>runways=5
+# ==>desc=Washington Dulles International Airport
+```
+
+## Conditional Writes, Upsert-like functionality and Neptune
+
+Upsert-like functionality, whereby you create a new vertex (or edge) only if it doesn't already exist. If it already
+exists, you use the existing instance.
+
+In Gremlin, you achieve this using a fold()-coalesce()-unfold() idiom. For a detailed explanation of this approach, see
+Using coalesce to only add a vertex if it does not exist.
+
+The coalesce() pattern allows you to determine whether an element already exists using any combination of ID, label and
+property predicates. However, Neptune does not enforce any label and/or property uniqueness constraints – and this can
+have serious consequences in concurrent write scenarios.
+
+If you are using the coalesce() pattern in concurrent write scenarios, but not using predictable user-supplied IDs, you
+can experience situations in which two writer processes (clients, threads, etc) attempt to create-or-return the same
+element at the same time. If both writers determine the element does not exist and they both attempt to create the
+element, you may end up with two elements, with the same labels and properties, but different IDs.
+
+Neptune will, however, assert uniqueness for vertex IDs and edge IDs. No two vertices can have the same ID; no two edges
+can have the same ID (a vertex and an edge, however, can have the same ID).
+
+The general guidance, therefore, is:
+
+When using coalesce(), always identify elements by their ID, rather than a property or label predicate. This is
+important in highly concurrent write scenarios: using a predictable ID for potentially new elements will ensure that
+only one writer wins should several writers attempt to create the same element simultaneously.
+
+Let's see this in more detail. For example, what happens if we were to attempt to create another vertex with ID '
+person0' (which is already in our graph)? Give the following code block a try. you get an error response 
+stating that the Vertex with id already exists.
+
+```groovy
+g.addV('Person').property(id, 'person0')
+# create another vertex with ID 'person0' 
+g.addV('Person').property(id,'person0')
+```
+
+Now let's try the same method, but placing the addV() inside of a fold()-coalesce()-unfold() pattern. This will check to
+see if the vertex is already there. If it is, the traversal will return the existing vertex id. If it isn't, it will
+create the vertex and return its id.
+
+```groovy
+g.V('person0').fold().\
+    coalesce(unfold(), addV('Person').property(id,'person0') )
+```
+
+**Now to perform the upsert of person0**
+```groovy
+g.V('person0').
+    fold().coalesce(
+        unfold(),
+        addV('Person').property(id,'person0').property('firstName','John').property('lastName','Doe')
+    )
+```
+
+## Bulk write operations
+You can also chain multiple addV() and addE() steps into a single traversal. This improves write throughput as each
+Gremlin query is considered a transaction (by default). Instead of commiting lots of smaller transactions, we can
+improve throughput by creating multiple vertices and edges (and properties) in a single transaction.
+
+In the following example, we will create a small sample graph with 5 vertices and 5 edges. We're also using the as()
+step here. The as() step allows us to save a result in the middle of a traversal and come back to it later in the
+traversal. In this example, we're saving the added vertices to be able to reference them again when we create edges.
+
+Further documentation:
+- as() - http://tinkerpop.apache.org/docs/3.4.4/reference/#as-step
+- Best practices for bulk transactional loads with Neptune - https://github.com/aws-samples/aws-dbs-refarch-graph/tree/master/src/writing-from-amazon-kinesis-data-streams
+
+```groovy
+g.addV('Hotel').property('name','MGM').as('MGM').
+    addV('Hotel').property('name','Aria').as('Aria').
+    addV('Hotel').property('name','Venetian').as('Venetian').
+    addV('Hotel').property('name','Wynn').as('Wynn').
+    addV('Hotel').property('name','Encore').as('Encore').
+    addE('Bus Route').from('MGM').to('Aria').
+    addE('Bus Route').from('Aria').to('Venetian').
+    addE('Bus Route').from('MGM').to('Wynn').
+    addE('Bus Route').from('Encore').to('Aria').
+    addE('Bus Route').from('Venetian').to('MGM')
+    
+g.V().hasLabel('Hotel').valueMap()
+
+g.E().hasLabel('Bus Route')    
+
+```
 
 >> References:
 > https://kelvinlawrence.net/book/PracticalGremlin.pdf
