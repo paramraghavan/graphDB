@@ -1,5 +1,5 @@
 # Render
-Visualize graph by connecting to AWS Neptune and work working jupyter notebook
+Visualize graph by connecting to AWS Neptune and work working graph notebook
 
 >Pre-requisite
 >> You should have loaded the airport and routes into the graph  by executing ../example/create_airport_routes_graph.py   
@@ -15,12 +15,12 @@ $ ~/miniconda.sh -b -p $HOME/miniconda
 
 ```shell
 # -n flag to specify the name of the environment, creates the file
-# conda create -n neptune_graph_viz
-# This command creates an environment based on the dependencies listed in the "environment.yml" - neptune_graph_viz.yaml file.
-conda env create -f ./neptune_graph_viz.yaml
-conda activate neptune_graph_viz
+# conda create -n neptune_graph_notebook
+# This command creates an environment based on the dependencies listed in the "environment.yml" - neptune_graph_notebook.yaml file.
+conda env create -f ./neptune_graph_notebook.yaml
+conda activate neptune_graph_notebook
 # run the following when you update the yaml file
-# conda env update -f ./neptune_graph_viz.yaml
+# conda env update -f ./neptune_graph_notebook.yaml
 
 # To deactivate an active environment, use
 #
@@ -28,14 +28,14 @@ conda activate neptune_graph_viz
 # list conda envs
 conda info --envs
 # remove env
-conda env remove --name neptune_graph_viz
+conda env remove --name neptune_graph_notebook
 ```
 
 ## Create Jupyter Kernel
 Once ipykernel is installed, you can create a Jupyter kernel for your Conda environment using the following command:
 ```shell
 # python -m ipykernel install --user --name your_environment_name --display-name "Your Environment Name"
-python -m ipykernel install --user --name neptune_graph_viz --display-name "Neptune Graph Viz"
+python -m ipykernel install --user --name neptune_graph_notebook --display-name "Neptune Graph Notebook"
 
 ```
 
