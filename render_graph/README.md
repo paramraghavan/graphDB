@@ -64,6 +64,11 @@ touch ~/.jupyter/nbconfig/notebook.json
 
 # start jupyter notebook
 python -m graph_notebook.start_notebook --notebooks-dir ~/notebook/destination/dir
+
+# Reference: https://github.com/aws/graph-notebook/blob/main/README.md
+# UsageError: Cell magic `%%graph_notebook_config` not found.
+python -m graph_notebook.ipython_profile.configure_ipython_profile
+
 ```
 
 # connect to local server
