@@ -112,12 +112,12 @@ for path in results:
 
 
 ## outE() vs out()
-**outE()**
-* outE() is typically used in graph databases or graph traversal frameworks to retrieve the outgoing edges of a vertex or node.
-* It returns all the edges that originate from the vertex, providing information about the relationships the vertex has with other vertices.
-* This function returns a collection or list of outgoing edges as its result.
+### outE()
+- outE() is typically used in graph databases or graph traversal frameworks to retrieve the outgoing edges of a vertex or node.
+- It returns all the edges that originate from the vertex, providing information about the relationships the vertex has with other vertices.
+- This function returns a collection or list of outgoing edges as its result.
 
-**out()**
+### out()
 - out() is used to retrieve the neighboring vertices that are connected to the current vertex via outgoing edges.
 - It returns all the vertices that can be reached by following the outgoing edges from the current vertex.
 - This function returns a collection or list of neighboring vertices as its result.

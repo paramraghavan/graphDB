@@ -11,7 +11,10 @@ To create a new vertex with a custom ID, use the property step with the id keywo
 
 All vertex IDs must be unique, and all edge IDs must be unique. However, Neptune does allow a vertex and an edge to have the same ID.
 
-If you try to create a new vertex using the g.addV() and a vertex with that ID already exists, the operation fails. The exception to this is if you specify a new label for the vertex, the operation succeeds but adds the new label and any additional properties specified to the existing vertex. Nothing is overwritten. A new vertex is not created. The vertex ID does not change and remains unique.
+If you try to create a new vertex using the g.addV() and a vertex with that ID already exists, the operation fails. The
+exception to this is if you specify a new label for the vertex, the operation succeeds but adds the new label and any
+additional properties specified to the existing vertex. Nothing is overwritten. A new vertex is not created. The vertex
+ID does not change and remains unique.
 
 ```groovy
 gremlin> g.addV('label1').property(id, 'customid')
@@ -21,8 +24,11 @@ gremlin> g.V('customid').label()
 ```
 
 ### Labels
-Neptune supports multiple labels for a vertex. When you create a label, you can specify multiple labels by separating them with ::. For example, g.addV("Label1::Label2::Label3") adds a vertex with three different labels. The hasLabel step matches this vertex with any of those three labels: hasLabel("Label1"), hasLabel("Label2"), and hasLabel("Label3").
 
+Neptune supports multiple labels for a vertex. When you create a label, you can specify multiple labels by separating
+them with ::. For example, g.addV("Label1::Label2::Label3") adds a vertex with three different labels. The hasLabel step
+matches this vertex with any of those three labels: hasLabel("Label1"), hasLabel("Label2"), and hasLabel("Label3").
+**Note:** the multiple labels are separated **by ;; and not** ::
 
 ## Tinkerpop
 **Creating the Vertex with a UUID**
@@ -60,7 +66,7 @@ g.close()
 In Apache TinkerPop, the ability to use a number or string datatype for the vertex ID depends on the underlying graph database you are using with TinkerPop.
 TinkerPop itself is a graph computing framework that provides a standard way to interact with various graph databases, but it doesn't enforce specific data types for vertex IDs. This flexibility means the actual data types allowed for vertex IDs, including whether you can use a string, is determined by the specific graph database implementation.
 
-Inmemory TinkerGraph, you can use Long data type as an identifier for a vertex and edge
+In memory TinkerGraph, you can use Long data type as an identifier for a vertex and edge
 ```groovy
 g.addV('vertexLabel').property(id, 123).next()
 # Query vertx by id
@@ -73,10 +79,11 @@ g.V(123).next()
 - Some graphs don't allow setting the ID, you have to  set custom property - use number or String data type and use it as id, see example below:
   - Creating a Vertex with a Custom Integer ID Property:
   ```groovy
-  g.addV('vertexLabel').property('myCustomId', 123).next()
+  # multiple labels - vertexLabel1 and vertexLabel2
+  g.addV('vertexLabel1', 'vertexLabel2').property('myCustomId', 123).next()
   
-  # Following query finds the vertex with the label 'vertexLabel'
+  # Following query finds the vertex with the label 'vertexLabel1'
   # and a custom property 'myCustomId' with the value 123.
-  g.V().has('vertexLabel', 'myCustomId', 123).next()
+  g.V().has('vertexLabel1', 'myCustomId', 123).next()
 
   ```

@@ -32,6 +32,9 @@ Graph databases are ideal for scenarios where relationships are key, data is hig
 complex networks is essential. However, for applications with simpler, less interconnected data, or where the primary need is to store large volumes of data with 
 simple retrieval, traditional relational databases or other NoSQL databases might be more suitable.
 
+**For Quick Learning:** 
+See [Thinking In Gremlin](./advanced/thinking_in_graph.md)
+
 # Installing Apache TinkerPop on a Mac
 - TinkerPop requires Java to be installed on your system. You can check if Java is already installed and what version it is by running
 ```shell
@@ -51,6 +54,7 @@ bin/gremlin.sh
 ## Tutorial
 - https://www.kelvinlawrence.net/book/PracticalGremlin.html
 - [Gremlin CheatSheet](https://dkuppitz.github.io/gremlin-cheat-sheet/101.html)
+- [Thinking In Gremlin](./advanced/thinking_in_graph.md)
 
 # Gremlin
 You can get a list of the available commands by typing :help. Note that all commands to the console itself are prefixed by a colon ":". This enables the
