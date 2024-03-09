@@ -83,6 +83,11 @@ g.V().repeat(out()).times(5).path()
 g.V().outE().inV().path()
 
 ```
+```shell
+## start jupyter notebook
+python -m graph_notebook.start_notebook --notebooks-dir ~/notebook/destination/dir
+```
+
 
 ## Reference for graph notebook
 - https://github.com/aws/graph-notebook?tab=readme-ov-file
