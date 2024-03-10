@@ -1,6 +1,9 @@
 # What is Tinkerpop
-Apache TinkerPop is an open-source project providing a framework and a set of tools to unify different graph technologies under a common framework and language has made it a cornerstone in the field of graph computing. TinkerPop defines both a graph computing framework and a query language called Gremlin.
 
+Apache TinkerPop is an open-source project providing a framework and a set of tools to unify different graph
+technologies under a common framework and language has made it a cornerstone in the field of graph computing. TinkerPop
+defines both a graph computing framework and a query language called Gremlin. We will be using Tinkerpop on localhost 
+and AWS Neptune.
 
 # Why Graph database
 Here are the 3 main reasons:
@@ -15,7 +18,7 @@ an edge might not only connect two people (nodes) but also carry information lik
 in data structures. This flexibility is beneficial in scenarios where data and relationships are constantly evolving, such as in 
 content management systems or in scenarios involving unstructured data. This schema-less nature allows for easier integration of new
 types of data and relationships without the need for extensive database redesign.
-  * The first-class nature of edges allows for more flexibility in data modeling. Relationships are not confined to rigid table structures and can evolve over time
+>The first-class nature of edges allows for more flexibility in data modeling. Relationships are not confined to rigid table structures and can evolve over time
   without the need for significant schema changes, which is often a limitation in relational databases relying on foreign keys.
 * **Intuitive Data Modeling and Visualization**: The graph model is often more intuitive for representing complex relationships and networks 
 of data. This can make it easier for developers and data scientists to model and visualize complex structures, like supply chains or network 
@@ -32,7 +35,7 @@ Graph databases are ideal for scenarios where relationships are key, data is hig
 complex networks is essential. However, for applications with simpler, less interconnected data, or where the primary need is to store large volumes of data with 
 simple retrieval, traditional relational databases or other NoSQL databases might be more suitable.
 
-**For Quick Learning:** 
+**Learning Path:** 
 - [Thinking In Gremlin](thinking_in_graph.md)
 - [Graph Use Cases](graph_usecases%2FREADME.md)
 
@@ -235,7 +238,7 @@ with any of those three labels: hasLabel("Label1"), hasLabel("Label2"), and hasL
 ref: https://docs.aws.amazon.com/neptune/latest/userguide/access-graph-gremlin-differences.html
 
 ## Setup python neptune environment
-- [Setup Env for Neptune](./render_graph/README.md)
+- [Setup Env for Neptune](./graph-notebook/README.md)
 
 ## Useful links
 - https://github.com/aws/graph-notebook

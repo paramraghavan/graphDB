@@ -2,7 +2,7 @@
 Visualize graph by connecting to AWS Neptune and work working graph notebook
 
 >Pre-requisite
->> You should have loaded the airport and routes into the graph  by executing ../example/create_airport_routes_graph.py   
+>> You should have loaded the airport and routes into the graph [air-routes-graph-load](..%2Fadvanced%2Fair-routes-graph-load.md)
 
 ## Setup conda
 ```shell
