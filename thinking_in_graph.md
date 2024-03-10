@@ -5,22 +5,31 @@ graph databases, directly stored and efficiently traversed, unlike foreign keys 
 databases. All graph traversals start with either a g.V() or a g.E().
 
 - Vertices and Edges: Think of vertices as your data records and edges as the relationships between these records.
-- Traversal: Moving from one vertex to another through edges. It's akin to navigating through foreign key relationships but more flexible and powerful.
+- Traversal: Moving from one vertex to another through edges. It's akin to navigating through foreign key relationships
+  but more flexible and powerful.
 - Filters and Conditions: Similar to WHERE clauses in SQL, but applied while traversing the graph.
 - Projection: Selecting specific properties of vertices or edges, similar to choosing columns in an SQL query.
+
+
+## Pre-Requisite
+**Load Air Routes**
+- See steps here, [air-routes-graph-load](advanced/air-routes-graph-load.md)
 
 ## SQL to Gremlin Analogies
 Here are some analogies to translate SQL concepts to Gremlin:
 
-- **SELECT**: In SQL, you select rows from a table. In Gremlin, you start a traversal (g.V(), g.E() for vertices and edges, respectively) and filter/select vertices or edges.
-- **WHERE**: Filtering is done in Gremlin using steps like has(), hasLabel(), and where() which are analogous to SQL's WHERE clause.
-- **JOIN**: Graph databases naturally represent relationships, so you don't need explicit JOINs. Traversing from one vertex to another via edges is inherently a "join" operation.
+- **SELECT**: In SQL, you select rows from a table. In Gremlin, you start a traversal (g.V(), g.E() for vertices and
+  edges, respectively) and filter/select vertices or edges.
+- **WHERE**: Filtering is done in Gremlin using steps like has(), hasLabel(), and where() which are analogous to SQL's
+  WHERE clause.
+- **JOIN**: Graph databases naturally represent relationships, so you don't need explicit JOINs. Traversing from one
+  vertex to another via edges is inherently a "join" operation.
 
 ## SQL 
 **SQL Table**
 - Airport table by country
 
-![Airport Table](./img.png)
+![Airport Table](advanced/img.png)
 
 ## Select
 SQL query to count the distribution of airports in each country as follows.
@@ -239,7 +248,7 @@ and an edge are considered **incident** if they are connected to each other.
 
 
 ### out() vs. outE()
-![User Item Purchase Graph](./img_1.png)
+![User Item Purchase Graph](advanced/img_1.png)
 
 In the graph above, we have four vertices and three edges. The vertex in the middle with the property "name": "sunny" is
 the vertex from where we'll start our traversal. The other three vertices are the items that I bought from an e-commerce

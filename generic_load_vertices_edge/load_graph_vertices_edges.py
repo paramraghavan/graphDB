@@ -1,6 +1,6 @@
 from gremlin_python.structure.graph import Graph
 from gremlin_python.driver.driver_remote_connection import DriverRemoteConnection
-from generic_load.parse_vertices_edges import load_graph_from_yaml
+from generic_load_vertices_edge.parse_vertices_edges import load_graph_from_yaml
 from gremlin_python.process.anonymous_traversal import traversal
 from gremlin_python.process.graph_traversal import __
 

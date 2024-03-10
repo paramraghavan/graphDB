@@ -1,5 +1,4 @@
 # Load Air Routes
-
 - start tinkerpop gremlin console
 - Clean up the graph database if need
 ```gremlin

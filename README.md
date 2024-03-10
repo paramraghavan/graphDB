@@ -33,7 +33,8 @@ complex networks is essential. However, for applications with simpler, less inte
 simple retrieval, traditional relational databases or other NoSQL databases might be more suitable.
 
 **For Quick Learning:** 
-See [Thinking In Gremlin](./advanced/thinking_in_graph.md)
+- [Thinking In Gremlin](thinking_in_graph.md)
+- [Graph Use Cases](graph_usecases%2FREADME.md)
 
 # Installing Apache TinkerPop on a Mac
 - TinkerPop requires Java to be installed on your system. You can check if Java is already installed and what version it is by running
@@ -54,7 +55,6 @@ bin/gremlin.sh
 ## Tutorial
 - https://www.kelvinlawrence.net/book/PracticalGremlin.html
 - [Gremlin CheatSheet](https://dkuppitz.github.io/gremlin-cheat-sheet/101.html)
-- [Thinking In Gremlin](./advanced/thinking_in_graph.md)
 
 # Gremlin
 You can get a list of the available commands by typing :help. Note that all commands to the console itself are prefixed by a colon ":". This enables the
@@ -167,9 +167,11 @@ serializer: { className: org.apache.tinkerpop.gremlin.util.ser.GraphBinaryMessag
 Also see --> https://aiogremlin.readthedocs.io/en/latest/index.html
 
 ```
-- conf/remote.yaml is the configuration file for the remote connection. This file should be present in your Gremlin Console's directory. It contains the details about how to connect to the Gremlin Server, including the host and port.
+- conf/remote.yaml is the configuration file for the remote connection. This file should be present in your Gremlin
+  Console's directory. It contains the details about how to connect to the Gremlin Server, including the host and port.
 - Issue gremlin commands on gremlin console
-- When you want to run Gremlin queries on a graph database that is not hosted locally, but on a remote server, you use the **:remote console** command to route your queries to that server.
+- When you want to run Gremlin queries on a graph database that is not hosted locally, but on a remote server, you use
+  the **:remote console** command to route your queries to that server.
   
 ```groovy
 g.V().count() // 6
