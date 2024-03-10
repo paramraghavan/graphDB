@@ -148,11 +148,13 @@ gremlin> :record stop
 Recording stopped; session saved as: "mylog.txt" (157 bytes)
 ```
 
-## TinkerGraph
-As well as the Gremlin Console, the TinkerPop 3 download includes an implementation of an in-memory graph store called TinkerGraph.
-The nice thing about TinkerGraph is that for learning and testing things you can run everything you need on your laptop or desktop computer and be up and running very quickly
+## TinkerGraph - an in-memory graph 
+The TinkerPop 3 download includes an implementation of an in-memory graph store called TinkerGraph and the Gremlin Console.
+The nice thing about TinkerGraph is that for learning and testing things you can run everything you need on your laptop
+or desktop computer and be up and running very quickly
 
-- When running in the Gremlin Console, support for TinkerGraph should be on by default. If for any reason you find it to be off you, can enable it by issuing the following command.
+- When running in the Gremlin Console, support for TinkerGraph should be on by default. If for any reason you find it to
+  be off you, can enable it by issuing the following command.
   ```groovy
   gremlin>:plugin use tinkerpop.tinkergraph
   ```
@@ -167,25 +169,26 @@ The nice thing about TinkerGraph is that for learning and testing things you can
   gremlin>graph.features()
   ```
 
-## conf/remote.yaml file on the console side
+## remote.yaml used to connect to Graph DB
+conf/remote.yaml file on the console side
 ```yaml
 hosts: [localhost]
 port: 8182
 serializer: { className: org.apache.tinkerpop.gremlin.util.ser.GraphBinaryMessageSerializerV1, config: { serializeResultToString: true }}
 ```
 
-## How to connect to gremlin server from gremlin console
+## How to connect to gremlin server/graphdb from gremlin console
 - start the Gremlin server
 - start the Gremlin console
 ### Connect to the Gremlin Server from console
-- Once the Gremlin Console is open, you can connect to your Gremlin Server using the :remote command followed by the connect command. The default Gremlin Server connection alias is usually g.
+- Once the Gremlin Console is open, you can connect to your Gremlin Server using the :remote command followed by the
+  connect command. The default Gremlin Server connection alias is usually g.
 ```groovy
 :remote connect tinkerpop.server conf/remote.yaml
 :remote console
 # increase timeout
 :remote config timeout 3000000 
 Also see --> https://aiogremlin.readthedocs.io/en/latest/index.html
-
 ```
 - conf/remote.yaml is the configuration file for the remote connection. This file should be present in your Gremlin
   Console's directory. It contains the details about how to connect to the Gremlin Server, including the host and port.
