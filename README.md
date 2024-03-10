@@ -1,9 +1,25 @@
-# What is Tinkerpop
+# What is GraphDB
 
+A graph database is a type of database that uses graph structures for semantic queries with nodes, edges, and properties
+to represent and store data. It is designed to handle data whose relationships are as important as the data itself.
+Popular graphdbs - Neo4j, AWS Neptune, ArangoDB, etc... Is tinkerpop a graphdb? We will be using Tinkerpop on localhost 
+and AWS Neptune.
+
+# What is Tinkerpop
 Apache TinkerPop is an open-source project providing a framework and a set of tools to unify different graph
 technologies under a common framework and language has made it a cornerstone in the field of graph computing. TinkerPop
-defines both a graph computing framework and a query language called Gremlin. We will be using Tinkerpop on localhost 
-and AWS Neptune.
+defines both a graph computing framework and a query language called Gremlin.
+
+- Implementation: It is **not a database itself** but provides a set of tools and APIs (like Gremlin) for building and
+  querying graph databases.
+- Compatibility: TinkerPop is designed to be compatible with various graph databases, including Neo4j, Apache Cassandra,
+  and more.
+- Features: It offers a standard way to interact with graph databases, regardless of the underlying database
+  implementation.
+- Use Cases: TinkerPop is used by developers to build and query graph databases in a consistent manner across different
+  database systems.
+> TinkerPop supports Cypher through an extension called Gremlin-Cypher. It is important to note that the support for
+> Cypher in TinkerPop might not be as extensive or optimized as in Neo4j, where Cypher is the native query language.
 
 # Why Graph database
 Here are the 3 main reasons:
@@ -38,6 +54,7 @@ simple retrieval, traditional relational databases or other NoSQL databases migh
 **Learning Path:** 
 - [Thinking In Gremlin](thinking_in_graph.md)
 - [Graph Use Cases](graph_usecases%2FREADME.md)
+
 
 # Installing Apache TinkerPop on a Mac
 - TinkerPop requires Java to be installed on your system. You can check if Java is already installed and what version it is by running
