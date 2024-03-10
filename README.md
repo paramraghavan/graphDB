@@ -19,7 +19,7 @@ defines both a graph computing framework and a query language called Gremlin.
 - Use Cases: TinkerPop is used by developers to build and query graph databases in a consistent manner across different
   database systems.
 > TinkerPop supports Cypher through an extension called Gremlin-Cypher. It is important to note that the support for
-> Cypher in TinkerPop might not be as extensive or optimized as in Neo4j, where Cypher is the native query language.
+> Cypher in TinkerPop is not extensive or optimized as in Neo4j, where Cypher is the native query language.
 
 # Why Graph database
 Here are the 3 main reasons:
