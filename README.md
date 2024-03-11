@@ -40,6 +40,12 @@ simple retrieval, traditional relational databases or other NoSQL databases migh
 **Learning Path:** 
 - [Thinking In Gremlin](thinking_in_graph.md)
 - [Graph Use Cases](graph_usecases%2FREADME.md)
+- [graph_schema](graph_schema.md)
+- [neptune_visualization_tool](neptune_visualization_tool.md)
+- [how_are_indexes_managed_in_neptune](how_are_indexes_managed_in_neptune.md)
+- [how_to_upload_to_neptune](how_to_upload_to_neptune.md)
+- [primary_keys_neptune](primary_keys_neptune.md)
+- [lineage queries](lineage.md)
 
 ## What is Tinkerpop
 Apache TinkerPop is an open-source project providing a framework and a set of tools to unify different graph
