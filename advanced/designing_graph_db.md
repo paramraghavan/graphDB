@@ -52,6 +52,8 @@ categories. for example source could be S3, Snowflake,RDBMS,etc..
 **Neptune supports multiple labels for a vertex.** When you create a label, you can specify multiple labels by separating
 them with ::. For example, g.addV("Label1::Label2::Label3") adds a vertex with three different labels. The hasLabel step
 matches this vertex with any of those three labels: hasLabel("Label1"), hasLabel("Label2"), and hasLabel("Label3").
+>It is best practice to use single label as multiple labels are not supported in all graph platforms
+Gremlin cannot delete labels. you can delete labels using openCypher, but at least one label has to be left.
 
 ## Indexing
 Neptune automatically indexes labels and relationship types, which helps in maintaining fast query 

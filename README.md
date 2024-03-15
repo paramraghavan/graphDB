@@ -40,7 +40,10 @@ simple retrieval, traditional relational databases or other NoSQL databases migh
 **Learning Path:** 
 - [Thinking In Gremlin](thinking_in_graph.md)
 - [Graph Use Cases](graph_usecases%2FREADME.md)
-- [graph_schema](graph_schema.md)
+- graph, schema,  datamodel
+  - [graph_schema](graph_schema.md)
+  - [graph_datamodel](advanced%2Fgraph_datamodel.md)
+  - [designing_graph_db](advanced%2Fdesigning_graph_db.md)
 - [neptune_visualization_tool](neptune_visualization_tool.md)
 - [how_are_indexes_managed_in_neptune](how_are_indexes_managed_in_neptune.md)
 - [how_to_upload_to_neptune](how_to_upload_to_neptune.md)
