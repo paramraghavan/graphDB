@@ -44,6 +44,7 @@ simple retrieval, traditional relational databases or other NoSQL databases migh
   - [graph_schema](graph_schema.md)
   - [graph_datamodel](advanced%2Fgraph_datamodel.md)
   - [designing_graph_db](advanced%2Fdesigning_graph_db.md)
+- [Gremlin CheatSheet](https://dkuppitz.github.io/gremlin-cheat-sheet/101.html)
 - [neptune_visualization_tool](neptune_visualization_tool.md)
 - [how_are_indexes_managed_in_neptune](how_are_indexes_managed_in_neptune.md)
 - [how_to_upload_to_neptune](how_to_upload_to_neptune.md)
