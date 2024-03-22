@@ -248,3 +248,10 @@ Neptune is a schema-less datastore. There are a couple of built-in constraints t
 use this as an ID for a related vertex or edge in your graph data model.
 - Every edge must have vertices on both sides of the edge. "Dangling edges" cannot exist in Neptune.
 
+## important links
+- https://docs.aws.amazon.com/neptune/latest/userguide/bulk-load.html
+- [loader reference](https://docs.aws.amazon.com/neptune/latest/userguide/load-api-reference.html)
+- [loader status check](https://docs.aws.amazon.com/neptune/latest/userguide/load-api-reference-status.html)
+- [check loader error in details](https://docs.aws.amazon.com/neptune/latest/userguide/load-api-reference-error-logs-examples.html)
+- Here how you get bulk loader error details
+  - curl -X GET 'https://your-neptune-endpoint:port/loader/0a237328-afd5-4574-a0bc-c29ce5f54802?details=true&errors=true&page=1&errorsPerPage=3'
