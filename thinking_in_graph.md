@@ -294,6 +294,29 @@ vertices. So if you call the has() function on that result, you'll be filtering 
 It’s the same story with the in() and inE() functions as well. If you want to filter edges based on extra properties,
 you use the inE() function instead of in().
 
+### out vs OutV
+
+#### Gremlin Out:
+
+* In Gremlin, out() is a step that moves the traversal to the outgoing adjacent vertices of the current vertex.
+* It traverses from the current vertex to its neighboring vertices via outgoing edges.
+* For example, if you have a vertex representing a person and outgoing edges representing relationships like "knows"
+  or "likes", using out() would traverse to vertices representing people that the current person knows or likes.
+* Example Gremlin traversal: g.V().hasLabel('person').out('knows')
+
+#### OutV:
+* In some contexts, particularly when working with property graphs and graph databases like JanusGraph or Neptune,
+  outV() is used to retrieve the outgoing vertices of an edge.
+* Unlike out(), which is used in the context of traversing from a vertex to its neighbors, outV() is used when you are
+  at an edge and want to retrieve the vertex it points to.
+* For example, if you have an edge representing a friendship between two people, using outV() on that edge would
+  retrieve the vertex representing the friend to whom the edge points.
+* Example usage: g.E().hasLabel('friend').outV()
+
+In summary, while both out() and outV() deal with traversing or accessing adjacent vertices, out() is a Gremlin step
+used for traversing from a vertex to its neighboring vertices via outgoing edges, whereas outV() is typically used to
+retrieve the vertex pointed to by an outgoing edge when you're traversing edges.
+
 ## What vertices and edges did I visit? - Introducing path
  After you have done some graph walking using a query you can use path to get a summary back of where you went
  
