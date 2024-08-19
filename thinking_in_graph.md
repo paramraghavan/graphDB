@@ -1368,6 +1368,49 @@ g.E().hasLabel('Bus Route')
 
 ```
 
+## Understanding Number of Record added to Amazon Neptune for each Node and Edge
+
+When you insert a node (vertex) or an edge into Amazon Neptune, the actual number of records created in the underlying
+database depends on the structure of the node or edge, including the properties associated with it. Here’s how it works:
+
+### Inserting a Node (Vertex)
+
+- **Single Record for the Node:** When you insert a vertex, a single record (or row) is created for that vertex in the
+  database.
+- **Additional Records for Properties:** Each property associated with the vertex may create additional records. For
+  example, if a vertex has three properties, the database may create a separate record for each property, depending on
+  how properties are stored internally.
+- **Metadata and Indexes:** If the vertex has labels or is indexed, there might be additional records created for
+  metadata or indexing purposes.
+
+#### Example:
+
+Inserting a vertex with label `Person` and properties `name`, `age`, and `city`:
+
+- 1 record for the vertex itself.
+- 3 records for the properties (`name`, `age`, and `city`).
+
+**Total:** 4 records might be created.
+
+### Inserting an Edge
+
+- **Single Record for the Edge:** When you insert an edge, a single record (or row) is created for that edge in the
+  database.
+- **Additional Records for Properties:** Similar to vertices, each property associated with the edge may create
+  additional records.
+- **Direction and Connection Information:** The edge also contains information about its source and target vertices,
+  which may result in additional metadata records depending on how the database handles edge connections.
+
+#### Example:
+
+Inserting an edge labeled `knows` between two vertices with properties `since` and `weight`:
+
+- 1 record for the edge itself.
+- 2 records for the properties (`since` and `weight`).
+
+**Total:** 3 records might be created.
+
+
 >> References:
 > https://kelvinlawrence.net/book/PracticalGremlin.pdf
 > https://blog.contactsunny.com/data-science/out-vs-oute-janusgraph-and-gremlin
