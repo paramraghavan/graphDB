@@ -196,3 +196,67 @@ To run this application, follow these steps:
     ```
 
 3. Open your browser and navigate to `http://localhost:5000` to see the graph visualization.
+
+#### Python Code to Convert elementMap() to D3.js Format
+```python
+import json
+
+# Example elementMap() result from Neptune query
+result = [
+    {"id": 1, "label": "person", "name": "Alice", "age": 30, "outE": {"knows": [{"id": 101, "inV": 2, "since": 2015}]}},
+    {"id": 2, "label": "person", "name": "Bob", "age": 35}
+]
+
+def convert_to_d3_format(element_map_result):
+    nodes = []
+    links = []
+
+    for element in element_map_result:
+        # Add vertex (node) to nodes list
+        node = {
+            "id": str(element.get("id")),
+            "label": element.get("label")
+        }
+        
+        # Add additional properties for the node (e.g., name, age)
+        for key, value in element.items():
+            if key not in ["id", "label", "outE", "inE"]:
+                node[key] = value
+
+        nodes.append(node)
+
+        # Process outgoing edges (outE) and add them as links
+        if "outE" in element:
+            for edge_label, edge_list in element["outE"].items():
+                for edge in edge_list:
+                    link = {
+                        "source": str(element["id"]),
+                        "target": str(edge["inV"]),
+                        "label": edge_label
+                    }
+                    
+                    # Add additional properties of the edge (e.g., "since")
+                    for edge_key, edge_value in edge.items():
+                        if edge_key not in ["id", "inV", "outV"]:
+                            link[edge_key] = edge_value
+
+                    links.append(link)
+
+    # Return the graph data in D3.js compatible format
+    graph_data = {
+        "nodes": nodes,
+        "links": links
+    }
+    return graph_data
+
+# Convert elementMap() result to D3.js format
+d3_graph_data = convert_to_d3_format(result)
+
+# Print the D3.js compatible JSON data
+print(json.dumps(d3_graph_data, indent=2))
+
+# Optionally, write the JSON data to a file to be consumed by D3.js
+with open('graph_data.json', 'w') as f:
+    json.dump(d3_graph_data, f, indent=2)
+
+```
