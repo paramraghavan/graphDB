@@ -199,85 +199,42 @@ To run this application, follow these steps:
 
 #### Python Code to Convert elementMap() to D3.js Format
 ```python
-import json
-
-# Sample Gremlin elementMap result
-result = [
-    {
-        "id": 1,
-        "label": "person",
-        "name": "Alice",
-        "age": 30,
-        "outE": {
-            "knows": [{"id": 101, "inV": 2, "since": 2015}]
-        }
-    },
-    {
-        "id": 2,
-        "label": "person",
-        "name": "Bob",
-        "age": 35
-    }
-]
-
-# Initialize empty node and link lists
 nodes = []
-links = []
+edges = []
 
-# Dictionary to track already added nodes
-added_nodes = set()
+def parse_element_map(element_map, depth=0):
+    if isinstance(element_map, list):
+        for item in element_map:
+            parse_element_map(item, depth + 1)
+    elif isinstance(element_map, dict):
+        node = {}
+        edge = {}
+        for key, value in element_map.items():
+            if key == "outE":
+                for edge_label, edge_list in value.items():
+                    for edge_item in edge_list:
+                        source_id = element_map.get("id")
+                        target_id = edge_item['inV'].get('id')
+                        edges.append({
+                            'source': source_id,
+                            'target': target_id,
+                            'label': edge_item.get('label'),
+                            'properties': {k: v for k, v in edge_item.items() if k not in ['id', 'label', 'inV']}
+                        })
+                        # Recursively parse target node
+                        parse_element_map(edge_item['inV'], depth + 1)
+            elif key == 'id' or key == 'label':
+                node[key] = value
+            else:
+                node[key] = value
+        if node:
+            nodes.append(node)
 
-# Function to add nodes if not already added
-def add_node(node_id, label, properties):
-    if node_id not in added_nodes:
-        nodes.append({
-            "id": node_id,
-            "label": label,
-            "properties": properties
-        })
-        added_nodes.add(node_id)
+# Parse the result
+parse_element_map(result)
 
-# Parse the elementMap recursively
-for element in result:
-    # Add the node (vertex)
-    node_id = element.get("id")
-    node_label = element.get("label")
-    node_properties = {k: v for k, v in element.items() if k not in ["id", "label", "outE"]}
-    add_node(node_id, node_label, node_properties)
-
-    # If the node has outgoing edges (outE)
-    if "outE" in element:
-        for edge_label, edges in element["outE"].items():
-            for edge in edges:
-                edge_id = edge.get("id")
-                target_id = edge.get("inV")
-                edge_properties = {k: v for k, v in edge.items() if k not in ["id", "inV"]}
-                
-                # Add the target node if not already added
-                add_node(target_id, None, {})  # In this case, we don't know the label/properties yet
-                
-                # Add the edge (link)
-                links.append({
-                    "source": node_id,
-                    "target": target_id,
-                    "label": edge_label,
-                    "properties": edge_properties
-                })
-
-# Create the D3.js compatible JSON structure
-graph_data = {
-    "nodes": nodes,
-    "links": links
-}
-
-# Convert the graph data into JSON format
-graph_json = json.dumps(graph_data, indent=2)
-
-# Print or save the JSON data
-print(graph_json)
-
-# Save to a JSON file (optional)
-with open('graph_data.json', 'w') as f:
-    f.write(graph_json)
+# Now you have separate nodes and edges lists
+print("Nodes:", nodes)
+print("Edges:", edges)
 
 ```
