@@ -201,62 +201,83 @@ To run this application, follow these steps:
 ```python
 import json
 
-# Example elementMap() result from Neptune query
+# Sample Gremlin elementMap result
 result = [
-    {"id": 1, "label": "person", "name": "Alice", "age": 30, "outE": {"knows": [{"id": 101, "inV": 2, "since": 2015}]}},
-    {"id": 2, "label": "person", "name": "Bob", "age": 35}
+    {
+        "id": 1,
+        "label": "person",
+        "name": "Alice",
+        "age": 30,
+        "outE": {
+            "knows": [{"id": 101, "inV": 2, "since": 2015}]
+        }
+    },
+    {
+        "id": 2,
+        "label": "person",
+        "name": "Bob",
+        "age": 35
+    }
 ]
 
-def convert_to_d3_format(element_map_result):
-    nodes = []
-    links = []
+# Initialize empty node and link lists
+nodes = []
+links = []
 
-    for element in element_map_result:
-        # Add vertex (node) to nodes list
-        node = {
-            "id": str(element.get("id")),
-            "label": element.get("label")
-        }
-        
-        # Add additional properties for the node (e.g., name, age)
-        for key, value in element.items():
-            if key not in ["id", "label", "outE", "inE"]:
-                node[key] = value
+# Dictionary to track already added nodes
+added_nodes = set()
 
-        nodes.append(node)
+# Function to add nodes if not already added
+def add_node(node_id, label, properties):
+    if node_id not in added_nodes:
+        nodes.append({
+            "id": node_id,
+            "label": label,
+            "properties": properties
+        })
+        added_nodes.add(node_id)
 
-        # Process outgoing edges (outE) and add them as links
-        if "outE" in element:
-            for edge_label, edge_list in element["outE"].items():
-                for edge in edge_list:
-                    link = {
-                        "source": str(element["id"]),
-                        "target": str(edge["inV"]),
-                        "label": edge_label
-                    }
-                    
-                    # Add additional properties of the edge (e.g., "since")
-                    for edge_key, edge_value in edge.items():
-                        if edge_key not in ["id", "inV", "outV"]:
-                            link[edge_key] = edge_value
+# Parse the elementMap recursively
+for element in result:
+    # Add the node (vertex)
+    node_id = element.get("id")
+    node_label = element.get("label")
+    node_properties = {k: v for k, v in element.items() if k not in ["id", "label", "outE"]}
+    add_node(node_id, node_label, node_properties)
 
-                    links.append(link)
+    # If the node has outgoing edges (outE)
+    if "outE" in element:
+        for edge_label, edges in element["outE"].items():
+            for edge in edges:
+                edge_id = edge.get("id")
+                target_id = edge.get("inV")
+                edge_properties = {k: v for k, v in edge.items() if k not in ["id", "inV"]}
+                
+                # Add the target node if not already added
+                add_node(target_id, None, {})  # In this case, we don't know the label/properties yet
+                
+                # Add the edge (link)
+                links.append({
+                    "source": node_id,
+                    "target": target_id,
+                    "label": edge_label,
+                    "properties": edge_properties
+                })
 
-    # Return the graph data in D3.js compatible format
-    graph_data = {
-        "nodes": nodes,
-        "links": links
-    }
-    return graph_data
+# Create the D3.js compatible JSON structure
+graph_data = {
+    "nodes": nodes,
+    "links": links
+}
 
-# Convert elementMap() result to D3.js format
-d3_graph_data = convert_to_d3_format(result)
+# Convert the graph data into JSON format
+graph_json = json.dumps(graph_data, indent=2)
 
-# Print the D3.js compatible JSON data
-print(json.dumps(d3_graph_data, indent=2))
+# Print or save the JSON data
+print(graph_json)
 
-# Optionally, write the JSON data to a file to be consumed by D3.js
+# Save to a JSON file (optional)
 with open('graph_data.json', 'w') as f:
-    json.dump(d3_graph_data, f, indent=2)
+    f.write(graph_json)
 
 ```
