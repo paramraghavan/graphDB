@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scrollable Graph Visualization</title>
+  <style>
+    .canvas-container {
+      width: 1200px; /* Set the visible width */
+      height: 800px; /* Set the visible height */
+      overflow: auto; /* Enable scrollbars if content exceeds container size */
+      border: 1px solid black;
+    }
+    .tooltip {
+      position: absolute;
+      background: #f1f1f1;
+      border: 1px solid #ccc;
+      padding: 5px;
+      display: none;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+<div class="canvas-container">
+  <canvas id="graphCanvas" width="1200" height="800"></canvas> <!-- Large canvas for the graph -->
+</div>
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+  // Graph data
+  const graph = {
+    "nodes": [
+      {"id": "company1", "label": "Company", "name": "TechCorp"},
+      {"id": "product1", "label": "Product", "name": "Product A"},
+      {"id": "product2", "label": "Product", "name": "Product B"},
+      {"id": "business_product1", "label": "Business Product", "name": "Business Product A1"},
+      {"id": "business_product2", "label": "Business Product", "name": "Business Product A2"},
+      {"id": "tech_product1", "label": "Tech Product", "name": "Tech Product B1"},
+      {"id": "tech_product2", "label": "Tech Product", "name": "Tech Product B2"},
+      {"id": "tech_component1", "label": "Tech Component", "name": "Tech Component B1.1"},
+      {"id": "tech_component2", "label": "Tech Component", "name": "Tech Component B1.2"},
+      {"id": "business_component1", "label": "Business Component", "name": "Business Component A1.1"},
+      {"id": "business_component2", "label": "Business Component", "name": "Business Component A1.2"}
+    ],
+    "links": [
+      {"source": "company1", "target": "product1", "label": "has"},
+      {"source": "company1", "target": "product2", "label": "has"},
+      {"source": "product1", "target": "business_product1", "label": "includes"},
+      {"source": "product1", "target": "business_product2", "label": "includes"},
+      {"source": "product2", "target": "tech_product1", "label": "includes"},
+      {"source": "product2", "target": "tech_product2", "label": "includes"},
+      {"source": "business_product1", "target": "business_component1", "label": "has"},
+      {"source": "business_product1", "target": "business_component2", "label": "has"},
+      {"source": "tech_product1", "target": "tech_component1", "label": "has"},
+      {"source": "tech_product1", "target": "tech_component2", "label": "has"}
+    ]
+  };
+
+  // Canvas setup
+  const canvas = document.getElementById("graphCanvas");
+  const ctx = canvas.getContext("2d");
+  const tooltip = document.getElementById("tooltip");
+
+  // Node positioning: Align nodes from left to right (company -> products -> sub-products -> components)
+  const rootX = 100;
+  const rootY = canvas.height / 2;
+  const xGap = 200; // Horizontal gap between node levels
+  const yGap = 100; // Vertical gap between sibling nodes
+
+  let productOffsetY = -50;  // Offset for product nodes to be centered relative to the company node
+  let businessOffsetY = -75; // Offset for business nodes
+  let techOffsetY = 75;      // Offset for tech nodes
+
+  // Position nodes according to the hierarchy
+  graph.nodes.forEach(node => {
+    if (node.id === "company1") {
+      // Company node (root)
+      node.x = rootX;
+      node.y = rootY;
+    } else if (node.id.startsWith("product")) {
+      // Product nodes (next level)
+      node.x = rootX + xGap;
+      node.y = rootY + productOffsetY;
+      productOffsetY += 100; // Spread product nodes vertically
+    } else if (node.id.startsWith("business_product")) {
+      // Business product nodes (next level)
+      node.x = rootX + 2 * xGap;
+      node.y = rootY + businessOffsetY;
+      businessOffsetY += 100; // Spread business product nodes vertically
+    } else if (node.id.startsWith("tech_product")) {
+      // Tech product nodes (next level)
+      node.x = rootX + 2 * xGap;
+      node.y = rootY + techOffsetY;
+      techOffsetY += 100; // Spread tech product nodes vertically
+    } else if (node.id.startsWith("business_component")) {
+      // Business component nodes (next level)
+      node.x = rootX + 3 * xGap;
+      node.y = rootY + businessOffsetY;
+      businessOffsetY += 100; // Spread business component nodes vertically
+    } else if (node.id.startsWith("tech_component")) {
+      // Tech component nodes (next level)
+      node.x = rootX + 3 * xGap;
+      node.y = rootY + techOffsetY;
+      techOffsetY += 100; // Spread tech component nodes vertically
+    }
+    node.radius = 20; // Set node size
+  });
+
+  // Draw graph
+  function drawGraph() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawLinks();
+    drawNodes();
+  }
+
+  // Draw links (edges)
+  function drawLinks() {
+    graph.links.forEach(link => {
+      const sourceNode = graph.nodes.find(n => n.id === link.source);
+      const targetNode = graph.nodes.find(n => n.id === link.target);
+      ctx.beginPath();
+      ctx.moveTo(sourceNode.x, sourceNode.y);
+      ctx.lineTo(targetNode.x, targetNode.y);
+      ctx.strokeStyle = "#999";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    });
+  }
+
+  // Draw nodes
+  function drawNodes() {
+    graph.nodes.forEach(node => {
+      // Draw node
+      ctx.beginPath();
+      ctx.arc(node.x, node.y, node.radius, 0, 2 * Math.PI);
+      ctx.fillStyle = "blue";
+      ctx.fill();
+      ctx.strokeStyle = "#fff";
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // Draw node labels
+      ctx.fillStyle = "#000";
+      ctx.font = "12px Arial";
+      ctx.textAlign = "center";
+      ctx.fillText(node.name, node.x, node.y + 4); // Adjust to center the text
+    });
+  }
+
+  // Check if mouse is over a node
+  function isMouseOverNode(x, y, node) {
+    const dx = x - node.x;
+    const dy = y - node.y;
+    return Math.sqrt(dx * dx + dy * dy) < node.radius;
+  }
+
+  // Handle hover over a node
+  canvas.addEventListener("mousemove", (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    let hoveredNode = null;
+
+    graph.nodes.forEach(node => {
+      if (isMouseOverNode(mouseX, mouseY, node)) {
+        hoveredNode = node;
+        tooltip.style.display = "block";
+        tooltip.style.left = `${e.pageX + 10}px`;
+        tooltip.style.top = `${e.pageY + 10}px`;
+        tooltip.textContent = `ID: ${node.id}, Label: ${node.label}`;
+      }
+    });
+
+    if (!hoveredNode) {
+      tooltip.style.display = "none";
+    }
+
+    drawGraph();
+    if (hoveredNode) {
+      ctx.beginPath();
+      ctx.arc(hoveredNode.x, hoveredNode.y, hoveredNode.radius, 0, 2 * Math.PI);
+      ctx.fillStyle = "red";
+      ctx.fill();
+      ctx.strokeStyle = "#fff";
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    }
+  });
+
+  // Handle node click
+  canvas.addEventListener("click", (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+
+    graph.nodes.forEach(node => {
+      if (isMouseOverNode(mouseX, mouseY, node)) {
+        alert(`Node clicked: ${node.name}`);
+      }
+    });
+  });
+
+  // Initial draw
+  drawGraph();
+</script>
+
+</body>
+</html>
