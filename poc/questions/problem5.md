@@ -1,0 +1,1 @@
+Gremlin query to return node depth
