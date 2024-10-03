@@ -144,3 +144,21 @@ Replace `tdNodeId` with the ID of the specific TD node you want to start from.
 This query provides a comprehensive view of the paths both before and after the matching TDE or interim node, giving you
 full visibility into the relevant parts of your graph structure while adhering to the specific relationships and
 possibilities you described.
+
+## Traverse up adn down the filtered node
+To query a graph using Gremlin and filter by a node property to get all nodes upstream and downstream from a specific
+node, starting from the root node, you can use a combination of traversal steps.
+
+Gremlin query for upstream and downstream nodes
+```gremlin
+g.V().hasLabel('root')  // Start from the root node
+  .repeat(out())  // Traverse downstream
+  .until(has('property', 'value'))  // Until we find the node with the specific property
+  .as('target')  // Mark this node as 'target'
+  .union(
+    __.repeat(__.in()).emit(),  // Traverse upstream from the target node
+    __.repeat(out()).emit()  // Traverse downstream from the target node
+  )
+  .dedup()  // Remove duplicate nodes
+  .path()  // Show the full path
+```
