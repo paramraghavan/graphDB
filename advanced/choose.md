@@ -1,27 +1,38 @@
+# What is choose doing in the query below
+
+It's functioning like a if/else, case/when
+
+- When value for variable,<OLIN_variable>, is 'FNA'
+    - then do not apply filter show all the order line item details for the customers latest order
+
+- When value for variable,<OLIN_variable>, is other than 'FNA'
+    - then do not apply filter, do not show all the order line item details, but filter by order line item whose value
+      is passed in the variable order line item number, <OLIN_variable>,  for the customers latest order
+
 ```gremlin
-g.V().hasLabel('AA').has('AA_id', '{{filter_by_AA}}')
-.outE().hasLabel('ttd').inV()
-.hasLabel('td').order().by('version', desc)
+g.V().hasLabel('customer').has('customer_id', 'customer id value')
+.outE().hasLabel('to-order').inV()
+.hasLabel('order').order().by('order_number', desc)
 .limit(1)
 .outE().inV()
 .choose(
-  values('{{filterByTDE}}').is(neq('NA')),
-  __.or(
-    __.hasLabel('tde').has('{{filterByTDE}}', neq('NA'))
-  ),
-  __.or(
-    __.hasLabel('tde').has('{{filterByTDE}}', 'NA'),
-    __.hasLabel('interim'),
-    __.hasLabel('tde')
-  )
+// if value matches 'NA', filter not applicable, do not apply filter  by orer line item number
+  __.constant(<OLIN_variable>).is('FNA'), 
+  __.filter(
+    __.or(
+      __.hasLabel('order-line-item')
+    )
+  ), //else
+  __.filter(
+  __.hasLabel('order-line-item').has('order_line_item_number, <OLIN_variable>))
 )
 .repeat(
   outE().inV()
   .or(
-    hasLabel('interim'),
-    hasLabel('tde'),
-    hasLabel('AA')
+    hasLabel('order_line_item_details'),
+    hasLabel('order-line-item-ship-status'),
+    hasLabel('customer-delivery-status')
   ).simplePath()
 )
-.path().unfold()
+.emit().path().unfold()
 ```
