@@ -56,3 +56,30 @@ g.V()
 ```
 
 This version will only traverse edges with the label 'specific_label'.
+
+## Above optional usage  breaks the links outgoing from asset node to nodes returned in the optional section
+
+```gremlin
+g.V()
+ // ... (your previous steps here)
+ .hasLabel('asset')
+ .map(
+   __.union(
+     __.identity(),
+     __.optional(
+       __.repeat(__.outE().inV())
+         .emit(__.outE())
+     )
+   )
+ )
+ .path()
+```
+### Inside map(), we use union() to combine two traversals:
+
+__.identity(): This ensures we always get a path that includes just the asset vertex, even if it has no outgoing edges.
+__.optional(...): This wraps the repeat traversal, ensuring it's only applied if there are outgoing edges.
+
+### Inside optional(), we have:
+
+repeat(__.outE().inV()): This traverses from the vertex to its outgoing edges, then to the connected vertices.
+emit(__.outE()): This emits the path at each outgoing edge, ensuring that edges are included in the path.
