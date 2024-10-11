@@ -83,3 +83,29 @@ __.optional(...): This wraps the repeat traversal, ensuring it's only applied if
 
 repeat(__.outE().inV()): This traverses from the vertex to its outgoing edges, then to the connected vertices.
 emit(__.outE()): This emits the path at each outgoing edge, ensuring that edges are included in the path.
+
+
+## Alternate options
+The query you've provided is close, but it needs a few adjustments to work correctly. Let's review and modify it:
+
+
+```gremlin
+g.V()
+ // ... (your previous steps here)
+ .hasLabel('asset')
+ .union(
+   __.filter(__.outE().count().is(0)),
+   __.repeat(__.outE().inV()).emit()
+ )
+ .path()
+ .by(elementMap())
+
+```
+
+Let's go through the changes and explain why they're necessary:
+
+This corrected query will:
+- Show A1 nodes (assets with no outgoing edges) as single-element paths.
+- Show A2 nodes along with all nodes and edges downstream from A2 as multi-element paths.
+
+The `union` step combines these two traversal patterns, ensuring that both types of assets are included in the result.
