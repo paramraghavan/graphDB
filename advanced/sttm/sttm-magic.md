@@ -1,5 +1,15 @@
-I have lots of SQL statements generated from lots of script thet run a set of processes for a subsystem, these sql
-outputs are in various files. the SQL could be delete insert, select, merge etc., you can skip delete statements I will
-combine all the files and extract all the distinct table names and generate a source to target mapping csv file for the
-tables which use Select, insert, merge - in the case of snowflake
-use python - tables as nodes and relation ship between source and target table as edges - id, from ,to - for neptune db 
+Have lots of SQL statements these sql outputs  could be delete insert, select, merge etc., you can skip delete statements.
+
+Use Select, insert, update,  create  or replace table  merge - in the case of snowflake.
+the table name could be prefixed with database name like database.table,
+could be prefixed with warehouse and database like warehouse.database.table
+
+Note that the sql statements are going to be complex  with  select into happening by joining in multiple tables with case statements, nested queries, it can have cTE’s as well and so on
+
+
+Is there  a library in python  to create source to target mapping random sql statements in a file and it figure out which table is source and which table is target
+
+if not :
+First step extract all the distinct table names and generate a source to target mapping csv file for the tables .
+
+Can we create  node and edge files for aws neptune, node label same as table name and edge label to-target
