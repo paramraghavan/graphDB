@@ -2,7 +2,7 @@ Have lots of SQL statements these sql outputs  could be delete insert, select, 
 
 Use Select, insert, update,  create  or replace table  merge - in the case of snowflake.
 the table name could be prefixed with database name like database.table,
-could be prefixed with warehouse and database like warehouse.database.table
+could be prefixed with warehouse and database like warehouse.database.table or database.schema.table
 
 Note that the sql statements are going to be complex  with  select into happening by joining in multiple tables with case statements, nested queries, it can have cTE’s as well and so on
 
@@ -13,3 +13,5 @@ if not :
 First step extract all the distinct table names and generate a source to target mapping csv file for the tables .
 
 Can we create  node and edge files for aws neptune, node label same as table name and edge label to-target
+
+Create  a complete solution for source to taget mapping
