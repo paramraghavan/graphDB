@@ -31,7 +31,7 @@ class SQLLineageParser:
         sql = ' '.join(sql.split()).upper()
 
         # Patterns for different table name formats
-        table_pattern = r'(?:[\w]+\.){0,2}[\w]+(?=\s|$)'
+        table_pattern = r'(?:[\w]+\.){0,3}[\w]+(?=\s|$)'
 
         sources = set()
         targets = set()
@@ -55,6 +55,7 @@ class SQLLineageParser:
         elif 'CREATE' in sql or 'REPLACE' in sql:
             # Find target table after CREATE TABLE or CREATE OR REPLACE TABLE
             target_match = re.search(f"(?:CREATE|REPLACE)\s+TABLE\s+({table_pattern})", sql)
+            target_match = re.search(f"(?:CREATE)\s+TABLE\s+({table_pattern})", sql)
             if target_match:
                 targets.add(target_match.group(1))
 
