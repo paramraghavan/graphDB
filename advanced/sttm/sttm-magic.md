@@ -1,6 +1,6 @@
 Have all the SQL statements/sql outputs for more than 10+ jobs that have run in sequence are lumped together in one
-file, the sql could be delete insert, select, merge etc., you can skip delete
-statements.
+file. The sql output has lots of random text detailing the action or logic performed, etc.. before and possibly after
+the actual sql statements. The sql could be delete insert, select, merge etc., you can skip delete statements.
 
 Use Select, insert, update, create or replace table merge - in the case of snowflake.
 the table name could be prefixed with database name like database.table,
