@@ -3,7 +3,6 @@ import networkx as nx
 import plotly.graph_objects as go
 from pyvis.network import Network
 import matplotlib.pyplot as plt
-import random
 
 
 class TableLineageVisualizer:
@@ -19,136 +18,164 @@ class TableLineageVisualizer:
             G.add_edge(row['Source Table'], row['Target Table'])
         return G
 
-    def create_interactive_plotly(self, output_html='graph_plotly.html'):
-        """Create interactive visualization using Plotly."""
-        # Create layout using Kamada-Kawai algorithm
-        pos = nx.kamada_kawai_layout(self.G)
+    def _get_hierarchical_layout(self):
+        """Create hierarchical layout with sources on left and targets on right."""
+        # Identify source and target nodes
+        sources = set(self.df['Source Table'])
+        targets = set(self.df['Target Table']) - sources
 
-        # Create edges
+        # Create positions dictionary
+        pos = {}
+
+        # Position source nodes on the left
+        source_y_spacing = 1.0 / (len(sources) + 1)
+        for i, source in enumerate(sorted(sources), 1):
+            pos[source] = (-1, i * source_y_spacing)
+
+        # Position target nodes on the right
+        target_y_spacing = 1.0 / (len(targets) + 1)
+        for i, target in enumerate(sorted(targets), 1):
+            pos[target] = (1, i * target_y_spacing)
+
+        return pos
+
+    def create_interactive_plotly(self, output_html='graph_plotly.html'):
+        """Create interactive visualization using Plotly with improved layout."""
+        pos = self._get_hierarchical_layout()
+
+        # Create edges with curved paths
         edge_x = []
         edge_y = []
         for edge in self.G.edges():
             x0, y0 = pos[edge[0]]
             x1, y1 = pos[edge[1]]
-            edge_x.extend([x0, x1, None])
-            edge_y.extend([y0, y1, None])
+
+            # Create curved path
+            cx = (x0 + x1) / 2  # Control point x
+            edge_x.extend([x0, cx, x1, None])
+            edge_y.extend([y0, (y0 + y1) / 2, y1, None])
 
         edge_trace = go.Scatter(
             x=edge_x, y=edge_y,
-            line=dict(width=0.5, color='#888'),
+            line=dict(width=1, color='#888'),
             hoverinfo='none',
-            mode='lines')
+            mode='lines'
+        )
 
         # Create nodes
         node_x = []
         node_y = []
+        node_text = []
+        node_colors = []
+
         for node in self.G.nodes():
             x, y = pos[node]
             node_x.append(x)
             node_y.append(y)
 
+            # Format node text: split database and table name
+            db, table = node.split('.')
+            node_text.append(f"{db}<br>{table}")
+
+            # Color nodes based on type (source or target)
+            color = '#1f77b4' if x < 0 else '#ff7f0e'  # Blue for source, Orange for target
+            node_colors.append(color)
+
         node_trace = go.Scatter(
             x=node_x, y=node_y,
             mode='markers+text',
             hoverinfo='text',
-            text=[str(node) for node in self.G.nodes()],
-            textposition="bottom center",
+            text=node_text,
+            textposition="middle right" if any(x < 0 for x in node_x) else "middle left",
             marker=dict(
-                showscale=True,
-                colorscale='YlGnBu',
-                size=20,
-                colorbar=dict(
-                    thickness=15,
-                    title='Node Connections',
-                    xanchor='left',
-                    titleside='right'
-                )
-            ))
+                size=30,
+                color=node_colors,
+                line=dict(width=2, color='white')
+            )
+        )
 
-        # Color nodes by number of connections
-        node_adjacencies = []
-        for node in self.G.nodes():
-            node_adjacencies.append(len(list(self.G.neighbors(node))))
-
-        node_trace.marker.color = node_adjacencies
-
-        # Create figure
-        fig = go.Figure(data=[edge_trace, node_trace],
-                        layout=go.Layout(
-                            title='Table Lineage Graph',
-                            showlegend=False,
-                            hovermode='closest',
-                            margin=dict(b=20, l=5, r=5, t=40),
-                            xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-                            yaxis=dict(showgrid=False, zeroline=False, showticklabels=False))
-                        )
+        # Create figure with improved layout
+        fig = go.Figure(
+            data=[edge_trace, node_trace],
+            layout=go.Layout(
+                title=dict(
+                    text='Table Lineage Graph',
+                    x=0.5,
+                    y=0.95,
+                    font=dict(size=20)
+                ),
+                showlegend=False,
+                hovermode='closest',
+                margin=dict(b=20, l=5, r=5, t=40),
+                plot_bgcolor='white',
+                xaxis=dict(
+                    showgrid=False,
+                    zeroline=False,
+                    showticklabels=False,
+                    range=[-1.2, 1.2]
+                ),
+                yaxis=dict(
+                    showgrid=False,
+                    zeroline=False,
+                    showticklabels=False,
+                    range=[-0.1, 1.1]
+                ),
+                height=600
+            )
+        )
 
         # Save to HTML file
         fig.write_html(output_html)
         return fig
 
-    def create_pyvis_network(self, output_html='graph_pyvis.html'):
-        """Create interactive visualization using PyVis."""
-        net = Network(height='750px', width='100%', directed=True)
-
-        # Add nodes with different colors for source and target
-        sources = set(self.df['Source Table'])
-        targets = set(self.df['Target Table'])
-
-        for node in self.G.nodes():
-            color = '#97c2fc' if node in sources else '#ff9999'  # Blue for source, Red for target
-            net.add_node(node, label=node, color=color)
-
-        # Add edges
-        for edge in self.G.edges():
-            net.add_edge(edge[0], edge[1])
-
-        # Set physics layout
-        net.set_options('''
-        var options = {
-          "physics": {
-            "forceAtlas2Based": {
-              "gravitationalConstant": -50,
-              "centralGravity": 0.01,
-              "springLength": 200,
-              "springConstant": 0.08
-            },
-            "maxVelocity": 50,
-            "solver": "forceAtlas2Based",
-            "timestep": 0.35,
-            "stabilization": {"iterations": 150}
-          }
-        }
-        ''')
-
-        # Save to HTML file
-        net.show(output_html)
-
     def create_static_graph(self, output_file='graph_static.png'):
-        """Create static visualization using NetworkX and Matplotlib."""
-        plt.figure(figsize=(15, 10))
+        """Create static visualization using NetworkX and Matplotlib with improved layout."""
+        plt.figure(figsize=(12, 8))
+        pos = self._get_hierarchical_layout()
 
-        # Use hierarchical layout
-        pos = nx.spring_layout(self.G, k=1, iterations=50)
+        # Draw edges with curved arrows
+        nx.draw_networkx_edges(
+            self.G, pos,
+            edge_color='gray',
+            arrows=True,
+            arrowsize=20,
+            connectionstyle='arc3,rad=0.2'
+        )
 
-        # Draw nodes
-        nx.draw_networkx_nodes(self.G, pos,
-                               node_color='lightblue',
-                               node_size=2000,
-                               alpha=0.7)
+        # Draw source nodes
+        sources = set(self.df['Source Table'])
+        nx.draw_networkx_nodes(
+            self.G, pos,
+            nodelist=sources,
+            node_color='lightblue',
+            node_size=2000,
+            alpha=0.7
+        )
 
-        # Draw edges
-        nx.draw_networkx_edges(self.G, pos,
-                               edge_color='gray',
-                               arrows=True,
-                               arrowsize=20)
+        # Draw target nodes
+        targets = set(self.df['Target Table']) - sources
+        nx.draw_networkx_nodes(
+            self.G, pos,
+            nodelist=targets,
+            node_color='lightcoral',
+            node_size=2000,
+            alpha=0.7
+        )
 
-        # Add labels
-        nx.draw_networkx_labels(self.G, pos,
-                                font_size=8,
-                                font_weight='bold')
+        # Add labels with improved formatting
+        labels = {}
+        for node in self.G.nodes():
+            db, table = node.split('.')
+            labels[node] = f"{db}\n{table}"
 
-        plt.title("Table Lineage Graph")
+        nx.draw_networkx_labels(
+            self.G, pos,
+            labels=labels,
+            font_size=8,
+            font_weight='bold'
+        )
+
+        plt.title("Table Lineage Graph", pad=20, size=16)
         plt.axis('off')
         plt.tight_layout()
 
@@ -166,13 +193,9 @@ def main():
     })
     sample_data.to_csv('sample_mapping.csv', index=False)
 
-    # Create visualizer
+    # Create visualizer and generate visualizations
     visualizer = TableLineageVisualizer('sample_mapping.csv')
-
-    # Generate all three types of visualizations
     visualizer.create_interactive_plotly()
-    # problem with pyvis
-    # visualizer.create_pyvis_network()
     visualizer.create_static_graph()
 
 
