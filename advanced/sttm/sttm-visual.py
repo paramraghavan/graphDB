@@ -10,6 +10,7 @@ class TableLineageVisualizer:
         """Initialize visualizer with mapping CSV file."""
         self.df = pd.read_csv(mapping_csv)
         self.G = self._create_graph()
+        self._organize_databases()
 
     def _create_graph(self):
         """Create NetworkX graph from DataFrame."""
@@ -18,110 +19,169 @@ class TableLineageVisualizer:
             G.add_edge(row['Source Table'], row['Target Table'])
         return G
 
-    def _get_hierarchical_layout(self):
-        """Create hierarchical layout with sources on left and targets on right."""
-        # Identify source and target nodes
-        sources = set(self.df['Source Table'])
-        targets = set(self.df['Target Table']) - sources
+    def _organize_databases(self):
+        """Organize tables by database and create swim lanes."""
+        # Extract unique databases
+        self.source_dbs = sorted(set(table.split('.')[0] for table in self.df['Source Table']))
+        self.target_dbs = sorted(set(table.split('.')[0] for table in self.df['Target Table']))
 
-        # Create positions dictionary
+        # Create mapping of tables to their databases
+        self.db_tables = {}
+        for table in self.G.nodes():
+            db = table.split('.')[0]
+            if db not in self.db_tables:
+                self.db_tables[db] = []
+            self.db_tables[db].append(table)
+
+        # Sort tables within each database
+        for db in self.db_tables:
+            self.db_tables[db] = sorted(self.db_tables[db])
+
+    def _get_swimlane_layout(self):
+        """Create layout with swim lanes based on databases."""
         pos = {}
 
-        # Position source nodes on the left
-        source_y_spacing = 1.0 / (len(sources) + 1)
-        for i, source in enumerate(sorted(sources), 1):
-            pos[source] = (-1, i * source_y_spacing)
+        # Calculate total number of databases and spacing
+        total_dbs = len(self.source_dbs) + len(self.target_dbs)
+        db_height = 1.0 / total_dbs
 
-        # Position target nodes on the right
-        target_y_spacing = 1.0 / (len(targets) + 1)
-        for i, target in enumerate(sorted(targets), 1):
-            pos[target] = (1, i * target_y_spacing)
+        # Position source database lanes on the left
+        for i, db in enumerate(self.source_dbs):
+            tables = self.db_tables[db]
+            table_spacing = db_height / (len(tables) + 1)
+            lane_y = i * db_height
+
+            # Position tables within the database lane
+            for j, table in enumerate(tables, 1):
+                pos[table] = (-1, lane_y + j * table_spacing)
+
+        # Position target database lanes on the right
+        for i, db in enumerate(self.target_dbs):
+            tables = self.db_tables[db]
+            table_spacing = db_height / (len(tables) + 1)
+            lane_y = i * db_height
+
+            # Position tables within the database lane
+            for j, table in enumerate(tables, 1):
+                pos[table] = (1, lane_y + j * table_spacing)
 
         return pos
 
     def create_interactive_plotly(self, output_html='graph_plotly.html'):
-        """Create interactive visualization using Plotly with improved layout."""
-        pos = self._get_hierarchical_layout()
+        """Create interactive visualization using Plotly with swim lanes."""
+        pos = self._get_swimlane_layout()
+
+        # Create figure with larger size
+        fig = go.Figure()
+
+        # Add swim lane backgrounds
+        total_dbs = len(self.source_dbs) + len(self.target_dbs)
+        db_height = 1.0 / total_dbs
+
+        # Add source database swim lanes
+        for i, db in enumerate(self.source_dbs):
+            fig.add_shape(
+                type="rect",
+                x0=-1.2,
+                x1=-0.8,
+                y0=i * db_height,
+                y1=(i + 1) * db_height,
+                fillcolor="rgba(230, 240, 255, 0.5)",
+                line=dict(color="rgba(0, 0, 0, 0.1)"),
+                layer="below"
+            )
+            # Add database label
+            fig.add_annotation(
+                x=-1.3,
+                y=(i + 0.5) * db_height,
+                text=db,
+                showarrow=False,
+                textangle=-90,
+                font=dict(size=12)
+            )
+
+        # Add target database swim lanes
+        for i, db in enumerate(self.target_dbs):
+            fig.add_shape(
+                type="rect",
+                x0=0.8,
+                x1=1.2,
+                y0=i * db_height,
+                y1=(i + 1) * db_height,
+                fillcolor="rgba(255, 240, 230, 0.5)",
+                line=dict(color="rgba(0, 0, 0, 0.1)"),
+                layer="below"
+            )
+            # Add database label
+            fig.add_annotation(
+                x=1.3,
+                y=(i + 0.5) * db_height,
+                text=db,
+                showarrow=False,
+                textangle=90,
+                font=dict(size=12)
+            )
 
         # Create edges with curved paths
-        edge_x = []
-        edge_y = []
         for edge in self.G.edges():
             x0, y0 = pos[edge[0]]
             x1, y1 = pos[edge[1]]
 
-            # Create curved path
-            cx = (x0 + x1) / 2  # Control point x
-            edge_x.extend([x0, cx, x1, None])
-            edge_y.extend([y0, (y0 + y1) / 2, y1, None])
-
-        edge_trace = go.Scatter(
-            x=edge_x, y=edge_y,
-            line=dict(width=1, color='#888'),
-            hoverinfo='none',
-            mode='lines'
-        )
+            fig.add_trace(go.Scatter(
+                x=[x0, (x0 + x1) / 2, x1],
+                y=[y0, (y0 + y1) / 2, y1],
+                mode='lines',
+                line=dict(color='rgba(136, 136, 136, 0.5)', width=1),
+                hoverinfo='none'
+            ))
 
         # Create nodes
-        node_x = []
-        node_y = []
-        node_text = []
-        node_colors = []
-
         for node in self.G.nodes():
             x, y = pos[node]
-            node_x.append(x)
-            node_y.append(y)
-
-            # Format node text: split database and table name
             db, table = node.split('.')
-            node_text.append(f"{db}<br>{table}")
 
-            # Color nodes based on type (source or target)
-            color = '#1f77b4' if x < 0 else '#ff7f0e'  # Blue for source, Orange for target
-            node_colors.append(color)
+            # Different colors and positions for source and target nodes
+            is_source = x < 0
+            color = '#1f77b4' if is_source else '#ff7f0e'
+            text_pos = 'middle right' if is_source else 'middle left'
 
-        node_trace = go.Scatter(
-            x=node_x, y=node_y,
-            mode='markers+text',
-            hoverinfo='text',
-            text=node_text,
-            textposition="middle right" if any(x < 0 for x in node_x) else "middle left",
-            marker=dict(
-                size=30,
-                color=node_colors,
-                line=dict(width=2, color='white')
-            )
-        )
+            fig.add_trace(go.Scatter(
+                x=[x],
+                y=[y],
+                mode='markers+text',
+                marker=dict(size=30, color=color, line=dict(width=2, color='white')),
+                text=table,  # Show only table name
+                textposition=text_pos,
+                hovertext=f"{db}.{table}",  # Show full name on hover
+                hoverinfo='text'
+            ))
 
-        # Create figure with improved layout
-        fig = go.Figure(
-            data=[edge_trace, node_trace],
-            layout=go.Layout(
-                title=dict(
-                    text='Table Lineage Graph',
-                    x=0.5,
-                    y=0.95,
-                    font=dict(size=20)
-                ),
-                showlegend=False,
-                hovermode='closest',
-                margin=dict(b=20, l=5, r=5, t=40),
-                plot_bgcolor='white',
-                xaxis=dict(
-                    showgrid=False,
-                    zeroline=False,
-                    showticklabels=False,
-                    range=[-1.2, 1.2]
-                ),
-                yaxis=dict(
-                    showgrid=False,
-                    zeroline=False,
-                    showticklabels=False,
-                    range=[-0.1, 1.1]
-                ),
-                height=600
-            )
+        # Update layout
+        fig.update_layout(
+            title=dict(
+                text='Table Lineage Graph',
+                x=0.5,
+                y=0.95,
+                font=dict(size=20)
+            ),
+            showlegend=False,
+            hovermode='closest',
+            margin=dict(b=20, l=100, r=100, t=40),
+            plot_bgcolor='white',
+            xaxis=dict(
+                showgrid=False,
+                zeroline=False,
+                showticklabels=False,
+                range=[-1.5, 1.5]
+            ),
+            yaxis=dict(
+                showgrid=False,
+                zeroline=False,
+                showticklabels=False,
+                range=[-0.1, 1.1]
+            ),
+            height=800,
+            width=1200
         )
 
         # Save to HTML file
@@ -129,9 +189,29 @@ class TableLineageVisualizer:
         return fig
 
     def create_static_graph(self, output_file='graph_static.png'):
-        """Create static visualization using NetworkX and Matplotlib with improved layout."""
-        plt.figure(figsize=(12, 8))
-        pos = self._get_hierarchical_layout()
+        """Create static visualization using NetworkX and Matplotlib with swim lanes."""
+        plt.figure(figsize=(15, 10))
+        pos = self._get_swimlane_layout()
+
+        # Draw swim lanes
+        total_dbs = len(self.source_dbs) + len(self.target_dbs)
+        db_height = 1.0 / total_dbs
+
+        # Draw source database swim lanes
+        for i, db in enumerate(self.source_dbs):
+            plt.axhspan(i * db_height, (i + 1) * db_height,
+                        xmin=0.1, xmax=0.45,
+                        color='lightblue', alpha=0.2)
+            plt.text(-1.4, (i + 0.5) * db_height, db,
+                     rotation=90, verticalalignment='center')
+
+        # Draw target database swim lanes
+        for i, db in enumerate(self.target_dbs):
+            plt.axhspan(i * db_height, (i + 1) * db_height,
+                        xmin=0.55, xmax=0.9,
+                        color='lightcoral', alpha=0.2)
+            plt.text(1.4, (i + 0.5) * db_height, db,
+                     rotation=-90, verticalalignment='center')
 
         # Draw edges with curved arrows
         nx.draw_networkx_edges(
@@ -139,10 +219,11 @@ class TableLineageVisualizer:
             edge_color='gray',
             arrows=True,
             arrowsize=20,
-            connectionstyle='arc3,rad=0.2'
+            connectionstyle='arc3,rad=0.2',
+            alpha=0.5
         )
 
-        # Draw source nodes
+        # Draw nodes
         sources = set(self.df['Source Table'])
         nx.draw_networkx_nodes(
             self.G, pos,
@@ -152,7 +233,6 @@ class TableLineageVisualizer:
             alpha=0.7
         )
 
-        # Draw target nodes
         targets = set(self.df['Target Table']) - sources
         nx.draw_networkx_nodes(
             self.G, pos,
@@ -162,12 +242,8 @@ class TableLineageVisualizer:
             alpha=0.7
         )
 
-        # Add labels with improved formatting
-        labels = {}
-        for node in self.G.nodes():
-            db, table = node.split('.')
-            labels[node] = f"{db}\n{table}"
-
+        # Add labels
+        labels = {node: node.split('.')[1] for node in self.G.nodes()}
         nx.draw_networkx_labels(
             self.G, pos,
             labels=labels,
@@ -186,10 +262,18 @@ class TableLineageVisualizer:
 
 # Example usage
 def main():
-    # Create sample mapping data
+    # Create sample mapping data with more varied examples
     sample_data = pd.DataFrame({
-        'Source Table': ['database1.table1', 'database1.table2', 'database2.table1', 'database3.table1'],
-        'Target Table': ['database4.target1', 'database4.target1', 'database4.target2', 'database4.target2']
+        'Source Table': [
+            'database1.table1', 'database1.table2',
+            'database2.table1', 'database2.table2',
+            'database3.table1', 'database3.table2'
+        ],
+        'Target Table': [
+            'database4.target1', 'database4.target1',
+            'database4.target2', 'database5.target1',
+            'database5.target1', 'database5.target2'
+        ]
     })
     sample_data.to_csv('sample_mapping.csv', index=False)
 
