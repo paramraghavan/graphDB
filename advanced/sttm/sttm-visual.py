@@ -125,55 +125,60 @@ class TableLineageVisualizer:
         net.show(output_html)
 
     def create_static_graph(self, output_file='graph_static.png'):
-        """Create static visualization using NetworkX and Matplotlib."""
+        """
+        Create static visualization using NetworkX and Matplotlib.
+        For increasing spacing b/w nodes horizontally and vertically
+        Key spacing adjustments:
+
+            For GraphViz layout:
+
+            Added -Gnodesep=1.0 for vertical spacing
+            Added -Granksep=2.0 for horizontal spacing
+            Scale positions by 1.5 for additional spacing
+
+            For custom layout:
+
+            Increased horizontal_spacing to 2.5
+            Increased vertical_spacing to 2.0
+
+            General improvements:
+
+            Increased figure size to (24, 16)
+            Increased node size to 3000
+            Increased margins to 0.3
+            Added min_target_margin and min_source_margin for edge spacing
+            Increased font size to 10
+
+            To adjust the spacing further, you can:
+
+            Increase the figure size (24, 16) for overall more space
+            Adjust horizontal_spacing and vertical_spacing in the custom layout
+            Modify -Gnodesep and -Granksep values in the GraphViz layout
+            Change the scaling factor (1.5) in the GraphViz position adjustment
+        """
         try:
             import pygraphviz
             from networkx.drawing.nx_agraph import graphviz_layout
 
-            plt.figure(figsize=(20, 10))
+            # Increase figure size for more spacing
+            plt.figure(figsize=(24, 16))
 
-            # Use dot layout for hierarchical left-to-right arrangement
-            pos = graphviz_layout(self.G, prog='dot', args='-Grankdir=LR')
+            # Use dot layout with custom spacing parameters
+            pos = graphviz_layout(self.G, prog='dot',
+                                  args='-Grankdir=LR -Gnodesep=1.0 -Granksep=2.0')
+            # nodesep: Minimum vertical space between nodes (higher value = more vertical spacing)
+            # ranksep: Minimum horizontal space between ranks (higher value = more horizontal spacing)
 
-            # Draw nodes
-            nx.draw_networkx_nodes(self.G, pos,
-                                   node_color='lightblue',
-                                   node_size=2000,
-                                   alpha=0.7)
-
-            # Draw edges
-            nx.draw_networkx_edges(self.G, pos,
-                                   edge_color='gray',
-                                   arrows=True,
-                                   arrowsize=20)
-
-            # Add labels
-            nx.draw_networkx_labels(self.G, pos,
-                                    font_size=8,
-                                    font_weight='bold')
-
-            plt.title("Table Lineage Graph")
-            plt.margins(x=0.2, y=0.2)
-            plt.axis('off')
-            plt.tight_layout()
-
-            # Save to file
-            plt.savefig(output_file, format='png', dpi=300, bbox_inches='tight')
-            plt.close()
+            # Scale up the positions for even more spacing
+            pos = {node: (x * 1.5, y * 1.5) for node, (x, y) in pos.items()}
 
         except ImportError:
-            # Fallback if pygraphviz is not available
-            plt.figure(figsize=(20, 10))
+            plt.figure(figsize=(24, 16))
 
-            # Custom layer assignment
             def get_hierarchy_pos(G):
-                # Find root nodes (nodes with no predecessors)
                 roots = [n for n in G.nodes() if G.in_degree(n) == 0]
-
-                # Calculate levels using longest path from root
                 levels = {}
                 for node in G.nodes():
-                    # Find the longest path from any root to this node
                     max_level = 0
                     for root in roots:
                         try:
@@ -183,55 +188,63 @@ class TableLineageVisualizer:
                             continue
                     levels[node] = max_level
 
-                # Assign positions
+                # Assign positions with increased spacing
                 width = max(levels.values()) + 1
                 height = len(G.nodes())
                 pos = {}
                 nodes_at_level = {}
 
-                # Group nodes by level
                 for node, level in levels.items():
                     if level not in nodes_at_level:
                         nodes_at_level[level] = []
                     nodes_at_level[level].append(node)
 
-                # Position nodes at each level
+                # Increase these multipliers for more spacing
+                horizontal_spacing = 2.5  # Increase for more horizontal space
+                vertical_spacing = 2.0  # Increase for more vertical space
+
                 for level in range(width):
                     nodes = nodes_at_level.get(level, [])
                     n_nodes = len(nodes)
                     for i, node in enumerate(nodes):
-                        pos[node] = (level * 1.5, (i - (n_nodes - 1) / 2) * 1.5)
+                        pos[node] = (
+                            level * horizontal_spacing,  # Horizontal spacing
+                            (i - (n_nodes - 1) / 2) * vertical_spacing  # Vertical spacing
+                        )
 
                 return pos
 
             pos = get_hierarchy_pos(self.G)
 
-            # Draw nodes
-            nx.draw_networkx_nodes(self.G, pos,
-                                   node_color='lightblue',
-                                   node_size=2000,
-                                   alpha=0.7)
+        # Draw with larger node sizes and spacing
+        nx.draw_networkx_nodes(self.G, pos,
+                               node_color='lightblue',
+                               node_size=3000,  # Increased node size
+                               alpha=0.7)
 
-            # Draw edges with slight curve
-            nx.draw_networkx_edges(self.G, pos,
-                                   edge_color='gray',
-                                   arrows=True,
-                                   arrowsize=20,
-                                   connectionstyle='arc3,rad=0.2')
+        # Draw edges with more curvature to avoid overlap
+        nx.draw_networkx_edges(self.G, pos,
+                               edge_color='gray',
+                               arrows=True,
+                               arrowsize=20,
+                               connectionstyle='arc3,rad=0.2',
+                               min_target_margin=30,  # Space between edge and node
+                               min_source_margin=30)  # Space between edge and node
 
-            # Add labels
-            nx.draw_networkx_labels(self.G, pos,
-                                    font_size=8,
-                                    font_weight='bold')
+        # Add labels with adjusted font size
+        nx.draw_networkx_labels(self.G, pos,
+                                font_size=10,  # Increased font size
+                                font_weight='bold')
 
-            plt.title("Table Lineage Graph")
-            plt.margins(x=0.2, y=0.2)
-            plt.axis('off')
-            plt.tight_layout()
+        plt.title("Table Lineage Graph")
+        # Increase margins for more space around the graph
+        plt.margins(x=0.3, y=0.3)
+        plt.axis('off')
+        plt.tight_layout()
 
-            # Save to file
-            plt.savefig(output_file, format='png', dpi=300, bbox_inches='tight')
-            plt.close()
+        # Save with higher DPI for better quality
+        plt.savefig(output_file, format='png', dpi=300, bbox_inches='tight')
+        plt.close()
 
     def create_static_graph3(self, output_file='graph_static.png'):
         """Create static visualization using NetworkX and Matplotlib."""
