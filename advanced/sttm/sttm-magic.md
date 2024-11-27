@@ -17,4 +17,7 @@ First step extract all the distinct table names and generate a source to target 
 
 Can we create node and edge files for aws neptune, node label same as table name and edge label to-target
 
-Create a complete solution for source to target mapping
+Create a complete solution for source to taget mapping we could have multiple source for target
+For example in the following sql:
+Create or replace table or view  () .. select from table1 left join table2 on table1.col1=table2.col1 left join table3
+on table3.col3=table2.col3 and coul have more
