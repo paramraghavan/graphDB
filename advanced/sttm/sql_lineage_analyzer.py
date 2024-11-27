@@ -3,6 +3,8 @@ import re
 from collections import defaultdict
 import csv
 import json
+import datetime
+import os
 
 def extract_sql_statements(log_file_path, output_file=None):
     """
