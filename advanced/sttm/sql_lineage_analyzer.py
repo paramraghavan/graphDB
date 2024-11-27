@@ -5,6 +5,7 @@ import csv
 import json
 import datetime
 import os
+from datetime import datetime
 
 def extract_sql_statements(log_file_path, output_file=None):
     """
@@ -22,7 +23,6 @@ def extract_sql_statements(log_file_path, output_file=None):
     sql_keywords = r'\b(SELECT|INSERT|UPDATE|DELETE|CREATE|CREATE OR REPLACE|DROP|ALTER|MERGE|TRUNCATE|BEGIN|COMMIT|ROLLBACK)\b'
 
     # Regular expression pattern to match SQL statements
-    # This pattern looks for SQL keywords followed by text until a semicolon or new line
     sql_pattern = f"({sql_keywords}.*?)(;|\n)"
 
     # Store extracted statements with metadata
@@ -83,6 +83,7 @@ class SQLLineageParser:
         """Initialize the parser with data structures to store mappings"""
         self.source_tables = set()
         self.target_tables = set()
+        self.table_relationships = defaultdict(set)  # Store relationships between tables
         self.mappings = []
 
     def extract_table_names(self, sql):
@@ -101,13 +102,16 @@ class SQLLineageParser:
         sql = ' '.join(sql.split()).upper()
 
         # Patterns for different table name formats
-        table_pattern = r'(?:[\w]+\.){0,3}[\w]+(?=\s|$)'
+        table_pattern = r'(?:[\w]+\.){0,3}[\w]+(?=\s|$|\))'
 
         sources = set()
         targets = set()
 
         # Parse the SQL statement
-        parsed = sqlparse.parse(sql)[0]
+        try:
+            parsed = sqlparse.parse(sql)[0]
+        except IndexError:
+            return [], []  # Return empty lists if parsing fails
 
         # Determine statement type
         stmt_type = parsed.get_type()
@@ -125,21 +129,27 @@ class SQLLineageParser:
         elif 'CREATE' in sql or 'REPLACE' in sql:
             # Find target table after CREATE TABLE or CREATE OR REPLACE TABLE
             target_match = re.search(f"(?:CREATE|REPLACE)\s+TABLE\s+({table_pattern})", sql)
-            target_match = re.search(f"(?:CREATE)\s+TABLE\s+({table_pattern})", sql)
             if target_match:
                 targets.add(target_match.group(1))
 
-        # Extract source tables from FROM and JOIN clauses
-        from_clauses = re.finditer(r'FROM\s+({})'.format(table_pattern), sql)
-        join_clauses = re.finditer(r'JOIN\s+({})'.format(table_pattern), sql)
+        # Extract source tables from FROM and JOIN clauses more comprehensively
+        # Handle basic FROM clause
+        from_match = re.search(r'FROM\s+({})'.format(table_pattern), sql)
+        if from_match:
+            sources.add(from_match.group(1))
 
-        # Add tables from FROM clauses
-        for match in from_clauses:
+        # Handle all types of JOINs
+        join_pattern = r'(?:LEFT|RIGHT|INNER|OUTER|CROSS|FULL)?\s*JOIN\s+({})'.format(table_pattern)
+        join_matches = re.finditer(join_pattern, sql)
+        for match in join_matches:
             sources.add(match.group(1))
 
-        # Add tables from JOIN clauses
-        for match in join_clauses:
-            sources.add(match.group(1))
+        # Handle subqueries in FROM clause
+        subquery_pattern = r'FROM\s+\((.*?)\)\s+(?:AS\s+)?(\w+)'
+        subqueries = re.finditer(subquery_pattern, sql, re.DOTALL)
+        for subquery in subqueries:
+            subquery_sources, _ = self.extract_table_names(subquery.group(1))
+            sources.update(subquery_sources)
 
         # Handle CTEs (Common Table Expressions)
         cte_pattern = r'WITH\s+(\w+)\s+AS\s*\('
@@ -157,13 +167,9 @@ class SQLLineageParser:
         Args:
             file_path (str): Path to SQL file
         """
-        # with open(file_path, 'r') as f:
-        #     sql_content = f.read()
-
-        # Split file into individual SQL statements
-        # statements = sqlparse.split(sql_content)
         statements = extract_sql_statements(file_path, None)
-        for stmt in statements:
+        for stmt_info in statements:
+            stmt = stmt_info['statement']
             if stmt.strip():
                 sources, targets = self.extract_table_names(stmt)
 
@@ -171,13 +177,16 @@ class SQLLineageParser:
                 self.source_tables.update(sources)
                 self.target_tables.update(targets)
 
-                # Create mappings for each source-target pair
+                # Store relationships between tables
                 for target in targets:
-                    for source in sources:
-                        self.mappings.append({
-                            'source': source,
-                            'target': target
-                        })
+                    self.table_relationships[target].update(sources)
+                    # Create mappings for the current statement
+                    self.mappings.append({
+                        'target': target,
+                        'sources': list(sources),
+                        'timestamp': stmt_info.get('timestamp'),
+                        'statement_type': stmt_info.get('type')
+                    })
 
     def generate_mapping_csv(self, output_file):
         """
@@ -187,9 +196,15 @@ class SQLLineageParser:
             output_file (str): Output CSV file path
         """
         with open(output_file, 'w', newline='') as f:
-            writer = csv.DictWriter(f, fieldnames=['source', 'target'])
-            writer.writeheader()
-            writer.writerows(self.mappings)
+            writer = csv.writer(f)
+            writer.writerow(['target', 'sources', 'timestamp', 'statement_type'])
+            for mapping in self.mappings:
+                writer.writerow([
+                    mapping['target'],
+                    '|'.join(mapping['sources']),  # Join multiple sources with pipe
+                    mapping.get('timestamp', ''),
+                    mapping.get('statement_type', '')
+                ])
 
     def generate_neptune_files(self, nodes_file, edges_file):
         """
@@ -207,18 +222,25 @@ class SQLLineageParser:
             nodes.append({
                 '~id': table,
                 '~label': table.split('.')[-1],  # Use last part of table name as label
-                'name': table
+                'name': table,
+                'type': 'TARGET' if table in self.target_tables else 'SOURCE'
             })
 
-        # Generate edges file
+        # Generate edges file with relationship metadata
         edges = []
-        for idx, mapping in enumerate(self.mappings):
-            edges.append({
-                '~id': f'e{idx}',
-                '~from': mapping['source'],
-                '~to': mapping['target'],
-                '~label': 'TO_TARGET'
-            })
+        edge_id = 0
+        for mapping in self.mappings:
+            target = mapping['target']
+            for source in mapping['sources']:
+                edges.append({
+                    '~id': f'e{edge_id}',
+                    '~from': source,
+                    '~to': target,
+                    '~label': 'FLOWS_TO',
+                    'statement_type': mapping.get('statement_type', ''),
+                    'timestamp': mapping.get('timestamp', '')
+                })
+                edge_id += 1
 
         # Write nodes file
         with open(nodes_file, 'w') as f:
