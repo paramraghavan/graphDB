@@ -41,7 +41,7 @@ class SQLLineageParser:
 
         # Remove any remaining lines that don't look like SQL
         sql_lines = []
-        for line in cleaned_sql.split('\n'):
+        for line in cleaned_sql.split(';'): #cleaned_sql.split('\n'):
             line = line.strip()
             # Keep lines that start with common SQL keywords or are part of SQL statements
             if (re.match(
@@ -51,6 +51,12 @@ class SQLLineageParser:
                 sql_lines.append(line)
 
         return ' '.join(sql_lines)
+
+    def check_keywords(self, string, keywords):
+        for keyword in keywords:
+            if keyword in string:
+                return True
+        return False
 
     def extract_table_names(self, sql):
         """
@@ -88,12 +94,13 @@ class SQLLineageParser:
                 return [], []
 
             # Extract target tables
-            if stmt_type in ('INSERT', 'UPDATE', 'MERGE'):
+            # if stmt_type in ('INSERT', 'UPDATE', 'MERGE'):
+            if self.check_keywords(sql, ['INSERT', 'UPDATE', 'MERGE']):
                 target_match = re.search(f"(?:INTO|UPDATE|MERGE INTO)\s+({table_pattern})", sql)
                 if target_match and not re.match(function_pattern, target_match.group(1)):
                     targets.add(target_match.group(1))
 
-            elif 'CREATE' in sql or 'REPLACE' in sql:
+            elif self.check_keywords(sql, ['CREATE', 'REPLACE']): #'CREATE' in sql or 'REPLACE' in sql:
                 target_match = re.search(f"(?:CREATE|REPLACE)\s+(VIEW|TABLE)\s+((?:[\w]+\.){0,3}[\w]+)", sql) #((?:[\w]+\.){0,3}[\w]+)
                 if target_match and not re.match(function_pattern, target_match.group(1)):
                     targets.add(target_match.group(1))
