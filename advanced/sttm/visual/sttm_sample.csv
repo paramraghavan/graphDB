@@ -1,0 +1,8 @@
+source,target
+customers,orders
+orders,order_items
+customers,customer_addresses
+order_items,products
+products,categories
+orders,shipments
+shipments,shipping_methods
