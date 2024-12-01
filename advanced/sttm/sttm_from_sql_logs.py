@@ -94,7 +94,7 @@ class SQLLineageParser:
                     targets.add(target_match.group(1))
 
             elif 'CREATE' in sql or 'REPLACE' in sql:
-                target_match = re.search(f"(?:CREATE|REPLACE)\s+TABLE\s+({table_pattern})", sql)
+                target_match = re.search(f"(?:CREATE|REPLACE)\s+(VIEW|TABLE)\s+((?:[\w]+\.){0,3}[\w]+)", sql) #((?:[\w]+\.){0,3}[\w]+)
                 if target_match and not re.match(function_pattern, target_match.group(1)):
                     targets.add(target_match.group(1))
 
